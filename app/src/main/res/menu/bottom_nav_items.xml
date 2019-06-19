@@ -10,31 +10,15 @@
         android:icon="@drawable/ic_search_black"
         />
 
-    <!--<item-->
-        <!--android:id="@+id/menu_notifications"-->
-        <!--android:title="@string/menu_notifications"-->
-        <!--android:icon="@drawable/ic_notifications_black" />-->
-    <item
-        android:title=""
-        />
+
     <item
         android:title="@string/menu_home"
-        android:icon="@drawable/ic_home_black"
+        android:icon="@drawable/ic_thumb_up_black_24dp"
         />
+
     <item
         android:title="@string/menu_home"
-        android:icon="@drawable/ic_home_black"
+        android:icon="@drawable/ic_directions_car_black_24dp"
         />
-    <!--<item-->
-        <!--android:title="@string/menu_search"-->
-        <!--android:icon="@drawable/ic_search_black"-->
-        <!--/>-->
-    <!--<item-->
-        <!--android:title="@string/menu_home"-->
-        <!--android:icon="@drawable/ic_home_black"-->
-        <!--/>-->
-    <!--<item-->
-        <!--android:title="@string/menu_search"-->
-        <!--android:icon="@drawable/ic_search_black"-->
-        <!--/>-->
+
 </menu>

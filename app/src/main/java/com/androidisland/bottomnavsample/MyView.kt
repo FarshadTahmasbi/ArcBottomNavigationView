@@ -2,35 +2,64 @@ package com.androidisland.bottomnavsample
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
-import android.view.animation.BounceInterpolator
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.view.ViewCompat
 import androidx.core.view.children
+import androidx.core.view.iterator
+import androidx.core.view.size
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlin.random.Random
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+
 
 class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(context, attrs) {
 
     companion object {
-        private const val STATE_CURVED = 1
-        private const val STATE_RECT = 2
         private const val CURVE_MAX_POINTS = 100
     }
 
-
-    private var state = STATE_CURVED
+    private var currentState: State = State.FLAT
+    //        set(value) {
+//            field = value
+//            updateInvisibleMenuItem(field)
+//        }
     private var animator: ValueAnimator? = null
-    private lateinit var pointSegments: MutableMap<Int, MutableList<PointF>>
-    val controlPath = Path()
+    private lateinit var visibleBound: RectF
+    //Keeps curved state points, only change when size changed
+    private lateinit var curvedBoundPoints: MutableList<PointF>
+    //Keeps flat state points, only change when size changed
+    private lateinit var flatBoundPoints: MutableList<PointF>
+    //Keeps points for current state, every time we assign it a list
+    //it changes currentPath and redraws view
+    //assignment should only happen in animation updates
+    private var currentPoints: MutableList<PointF> = mutableListOf()
+        set(value) {
+            field = value
+            currentPath = pointsToPath(field)
+            invalidate()
+        }
+    private var currentPath = Path()
+    private val invisibleMenuItemId = Random(System.currentTimeMillis()).nextInt()
+    private val navMenu = menu as MenuBuilder
+    private var itemSelectedListener: OnNavigationItemSelectedListener? = null
+    private var selectedItemIndex = 0
 
+
+    val controlPath = Path()
     val margin = 20.0f
     val radius = 80.0f
 
-    private lateinit var currentPath: Path
     private val curvePath = Path()
     private val rectPath = Path()
     //For debug purpose only
@@ -49,133 +78,101 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
 
     init {
         ViewCompat.setElevation(this, 0.0f)
-        postDelayed({
-            animateState()
-        }, 1000)
+//        postDelayed({
+//            transitionTo(if (currentState == State.FLAT) State.CURVED else State.FLAT)
+//        }, 1000)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-//        curvePath.apply {
-//            reset()
-//            val start = PointF(0.0f, radius)
-//            val p1 = PointF(w / 2 - 1.2f * radius - 4.0f * margin, start.y)
-//            val p2 = PointF(w / 2.toFloat() - 0.8f * radius, start.y)
-//            val p3 = PointF(w / 2 - 1.0f * radius - margin * .8f, start.y + radius + margin)
-//            val p4 = PointF(w / 2.toFloat(), start.y + radius + margin)
-//
-//            moveTo(start.x, start.y)
-//            lineTo(p1.x, p1.y)
-//            cubicTo(p2.x, p2.y, p3.x, p3.y, p4.x, p4.y)
-//
-//            val p5 = PointF(w - p3.x, p3.y)
-//            val p6 = PointF(w - p2.x, p2.y)
-//            val p7 = PointF(w - p1.x, p1.y)
-//
-//            cubicTo(p5.x, p5.y, p6.x, p6.y, p7.x, p7.y)
-//            lineTo(w.toFloat(), start.y)
-//            lineTo(w.toFloat(), h.toFloat())
-//            lineTo(start.x, h.toFloat())
-//            close()
-//
-//            rectPath.apply {
-//                reset()
-//                moveTo(0.0f, radius)
-//                lineTo(w.toFloat(), radius)
-//                lineTo(w.toFloat(), h.toFloat() + radius)
-//                lineTo(0.0f, h.toFloat() + radius)
-//                close()
-//            }
-//
-//            circle.apply {
-//                reset()
-//                addCircle(w / 2.toFloat(), radius, radius, Path.Direction.CW)
-//            }
-//
-//            controlPath.apply {
-//                //                moveTo(start.x, start.y)
-//                moveTo(p1.x, p1.y)
-//                lineTo(p2.x, p2.y)
-//                lineTo(p3.x, p3.y)
-//                lineTo(p4.x, p4.y)
-//                lineTo(p5.x, p5.y)
-//                lineTo(p6.x, p6.y)
-//                lineTo(p7.x, p7.y)
-//            }
-//        }
 
-//        currentPath = rectPath
-
-        /********************/
-//        val pm = PathMeasure()
-//        val point = FloatArray(2) { 0.0f }
-//
-//        val corners = getVisibleCorners()
-//        val curveStart = curveStart(w.toFloat())
-//        val curveEnd = curveEnd(w.toFloat())
-//
-//        points.add(PointF(corners[0].x, corners[1].y))
-//        points.add(PointF(curveStart.x, curveStart.y))
-//
-//        pm.setPath(createCurvePath(w.toFloat()), false)
-//        for (index in 0..CURVE_MAX_POINTS) {
-//            pm.getPosTan(pm.length * index / CURVE_MAX_POINTS.toFloat(), point, null)
-//            points.add(PointF(point[0], point[1]))
-//        }
-//
-//        points.add(PointF(curveEnd.x, curveEnd.y))
-//        points.add(PointF(corners[1].x, corners[1].y))
-//
-//        points.add(PointF(corners[2].x, corners[2].y))
-//        points.add(PointF(corners[3].x, corners[3].y))
-//        points.add(PointF(corners[0].x, corners[0].y))
-
-        pointSegments = createPointSegments(w.toFloat())
-        currentPath = pointSegmentsToPath(pointSegments)
-        Log.d("test123", "${pointSegments.size}")
-
-//            .apply { setPath(curvePath, false) }
-//        currentPath.reset()
-//        for (index in 0..10000) {
-//            val distance = pm.length * index / 1000.0f
-//            pm.getPosTan(distance, point, null)
-//            if (isCorner(point)) {
-//                Log.d("test37", "corner found->[${point[0]}, ${point[1]}]")
-//            }
-//            if (points.lastIndex > 1) {
-//                if (points.last().x == point[0] || points.last().y == point[1]) {
-//                    continue
-//                } else {
-//                    points.add(PointF(point[0], point[1]))
-//                }
-//            } else {
-//                points.add(PointF(point[0], point[1]))
-//            }
-//            if (index == 0) currentPath.moveTo(point[0], point[1])
-//            else currentPath.lineTo(point[0], point[1])
-//        }
-//
-//        Log.d("test80", "point size= ${points.size}")
-//        Log.d("test77", "size-> $w x $h")
-//        points.forEachIndexed { i, p ->
-//            Log.d("test85", "point[$i]=$p")
-//        }
-
-//        val pm = PathMeasure()
-//        pm.setPath(rectPath, false)
-//        Log.d("test123", "${pm.length}")
-//        pm.setPath(curvePath, false)
-//        Log.d("test123", "${pm.length}")
+        visibleBound = getVisibleBound()
+        curvedBoundPoints = createCurveBoundPoints(w.toFloat())
+        flatBoundPoints = createFlatBoundPoints(curvedBoundPoints)
+        currentPoints = if (currentState == State.FLAT) flatBoundPoints else curvedBoundPoints
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onFinishInflate() {
         super.onFinishInflate()
+        isItemHorizontalTranslationEnabled = false
         children.forEach {
             if (it is BottomNavigationMenuView) {
+//                it.layoutTransition = null
+                it.children.forEach { itemView ->
+                    if (itemView is BottomNavigationItemView) {
+                        itemView.setShifting(false)
+                    }
+                }
                 (it.layoutParams as LayoutParams).gravity = Gravity.BOTTOM
                 return@forEach
             }
         }
+        if (menu.size % 2 != 0) throw IllegalStateException("Item menu size should be even")
+        regenerateMenu()
+        navMenu.setCallback(object : MenuBuilder.Callback {
+            override fun onMenuModeChange(menu: MenuBuilder?) {
+            }
+
+            override fun onMenuItemSelected(menu: MenuBuilder?, item: MenuItem?): Boolean {
+                item?.apply {
+                    selectedItemIndex = menu?.children?.indexOf(item) ?: -1
+                    Log.d("test123", "selected=====> $selectedItemIndex")
+                    if (itemId != invisibleMenuItemId) {
+                        itemSelectedListener?.onNavigationItemSelected(this)
+                    }
+                }
+                return false
+            }
+        })
+    }
+
+    private fun regenerateMenu() {
+        val items = mutableListOf<MenuItem>().apply {
+            menu.iterator().forEach {
+                add(it)
+            }
+        }
+        menu.clear()
+        items.forEachIndexed { index, item ->
+            val order = if (index < items.size / 2) 1 else items.size
+            menu.add(item.groupId, item.itemId, order, item.title).apply {
+                icon = item.icon
+            }
+        }
+        updateInvisibleMenuItem(currentState)
+    }
+
+    private fun addInvisibleMenuItem() {
+        val invisibleItem = menu.findItem(invisibleMenuItemId)
+        if (invisibleItem == null) {
+            menu.add(Menu.NONE, invisibleMenuItemId, menu.size / 2, "").apply {
+                isEnabled = false
+                isChecked = false
+                isCheckable = false
+            }
+            if (selectedItemIndex >= menu.size / 2) selectedItemIndex++
+        }
+        Log.d("test123", "add:selected ---> $selectedItemIndex")
+        menu.getItem(selectedItemIndex).isChecked = true
+    }
+
+    private fun removeInvisibleMenuItem() {
+        val invisibleItem = menu.findItem(invisibleMenuItemId)
+        invisibleItem?.apply {
+            if (selectedItemIndex > menu.size / 2) selectedItemIndex--
+            menu.removeItem(invisibleItem.itemId)
+            menu.getItem(selectedItemIndex).isChecked = true
+        }
+    }
+
+    private fun invisibleItemExists() = menu.size() % 2 == 1
+
+    private fun invisibleMenuItem() = findViewById<View>(invisibleMenuItemId)
+
+    private fun updateInvisibleMenuItem(state: State) {
+        if (state == State.FLAT) removeInvisibleMenuItem()
+        else addInvisibleMenuItem()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -184,60 +181,30 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
     }
 
     override fun onDraw(canvas: Canvas?) {
-        canvas?.apply {
-            //            clipPath(path)
-//            clipRect(Rect(0, 0, 100, 100))
-//            drawPath(path, paint)
-//            drawPath(controlPath, paint2)
-//            drawPath(circle, cPath)
-        }
-//        canvas?.clipRect(Rect(0, 0, 100, 100))
-//        canvas?.clipPath(path)
+//        canvas?.apply {
+//            drawPath(currentPath, controlPaint)
+//        }
+        canvas?.clipPath(currentPath)
         super.onDraw(canvas)
     }
 
     override fun dispatchDraw(canvas: Canvas?) {
+        canvas?.clipPath(currentPath)
         super.dispatchDraw(canvas)
     }
 
     override fun draw(canvas: Canvas?) {
-        canvas?.apply {
-            //            drawPath(circle, circlePaint)
-            drawPath(currentPath, controlPaint)
+        canvas?.clipPath(currentPath)
+//        canvas?.apply {
 //            clipPath(currentPath)
-        }
-//        super.draw(canvas)
-    }
-
-    private fun animateState() {
-        animator?.apply {
-            cancel()
-        }
-
-        animator = ValueAnimator.ofFloat(1.0f, 0.0f)
-            .apply {
-                duration = 1000
-                interpolator = BounceInterpolator()
-                val bound = getVisibleBound()
-                val top = bound.top
-                val curvePoints = pointSegments[1]?.toMutableList()!!
-                val dy = FloatArray(curvePoints.size) { index ->
-                    if (isCorner(curvePoints[index])) 0.0f
-                    else curvePoints[index].y - top
-                }
-                addUpdateListener {
-                    currentPath.reset()
-                    val percent = it.animatedValue as Float
-                    pointSegments[1]?.forEachIndexed { index, point ->
-//                        if (point.y > bound.top && point.y < bound.bottom) {
-                            point.y = top + dy[index] * percent
-//                        }
-                    }
-                    currentPath = pointSegmentsToPath(pointSegments)
-                    invalidate()
-                }
-                start()
-            }
+//        }
+//        background?.apply {
+//            if (this is ColorDrawable) {
+//                controlPaint.color = color
+//                canvas?.drawPath(currentPath, controlPaint)
+//            }
+//        }
+        super.draw(canvas)
     }
 
     private fun isCorner(point: FloatArray): Boolean {
@@ -249,18 +216,17 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
 
     private fun isCorner(point: PointF) = isCorner(floatArrayOf(point.x, point.y))
 
-
     private fun getVisibleBound(): RectF {
         return RectF(0.0f, radius, width.toFloat(), height.toFloat())
     }
 
+
     private fun getVisibleCorners(): List<PointF> {
-        val bound = getVisibleBound()
         return listOf(
-            PointF(bound.left, bound.top),
-            PointF(bound.right, bound.top),
-            PointF(bound.right, bound.bottom),
-            PointF(bound.left, bound.bottom)
+            PointF(visibleBound.left, visibleBound.top),
+            PointF(visibleBound.right, visibleBound.top),
+            PointF(visibleBound.right, visibleBound.bottom),
+            PointF(visibleBound.left, visibleBound.bottom)
         )
     }
 
@@ -328,62 +294,173 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
         }
     }
 
-    private fun createPointSegments(width: Float): MutableMap<Int, MutableList<PointF>> {
-        val pointMap = mutableMapOf<Int, MutableList<PointF>>()
-        val pm = PathMeasure()
-        val point = FloatArray(2) { 0.0f }
+    private fun createCurveBoundPoints(width: Float): MutableList<PointF> {
+        return mutableListOf<PointF>().apply {
 
-        val corners = getVisibleCorners()
-        val curveStart = curveStart(width)
-        val curveEnd = curveEnd(width)
+            val corners = getVisibleCorners()
+            val curveStart = curveStart(width)
+            val curveEnd = curveEnd(width)
 
-        return pointMap.apply {
             //top-right segment
-            put(
-                0, mutableListOf(
-                    PointF(corners[0].x, corners[1].y),
-                    PointF(curveStart.x, curveStart.y)
-                )
-            )
+            add(PointF(corners[0].x, corners[1].y))
+            add(PointF(curveStart.x, curveStart.y))
 
             //Curve points
-            val curvePoints = mutableListOf<PointF>()
+            val pm = PathMeasure()
+            val point = FloatArray(2) { 0.0f }
             pm.setPath(createCurvePath(width), false)
             for (index in 0..CURVE_MAX_POINTS) {
                 pm.getPosTan(pm.length * index / CURVE_MAX_POINTS.toFloat(), point, null)
-                curvePoints.add(PointF(point[0], point[1]))
+                add(PointF(point[0], point[1]))
             }
-            put(1, curvePoints)
-
 
             //top-left segment
-            put(
-                2, mutableListOf(
-                    PointF(curveEnd.x, curveEnd.y),
-                    PointF(corners[1].x, corners[1].y)
-                )
-            )
+            add(PointF(curveEnd.x, curveEnd.y))
+            add(PointF(corners[1].x, corners[1].y))
+
 
             //right-bottom-left segment
-            put(
-                3, mutableListOf(
-                    PointF(corners[2].x, corners[2].y),
-                    PointF(corners[3].x, corners[3].y),
-                    PointF(corners[0].x, corners[0].y)
-
-                )
-            )
+            add(PointF(corners[2].x, corners[2].y))
+            add(PointF(corners[3].x, corners[3].y))
+            add(PointF(corners[0].x, corners[0].y))
         }
     }
 
-    private fun pointSegmentsToPath(segments: MutableMap<Int, MutableList<PointF>>): Path {
-        return Path().apply {
-            segments.forEach {
-                it.value.forEachIndexed { index, point ->
-                    if (it.key == 0 && index == 0) moveTo(point.x, point.y)
-                    else lineTo(point.x, point.y)
+    private fun createFlatBoundPoints(curveBoundPoints: MutableList<PointF>): MutableList<PointF> {
+        return curveBoundPoints.clone().apply {
+            forEach { point ->
+                if (shouldAnimate(point)) {
+                    point.y = visibleBound.top
                 }
             }
         }
     }
+
+    private fun pointsToPath(points: MutableList<PointF>): Path {
+        return Path().apply {
+            points.forEachIndexed { index, point ->
+                if (index == 0) moveTo(point.x, point.y)
+                else lineTo(point.x, point.y)
+            }
+        }
+    }
+
+    /**
+     * Check if the point is supposed to animate or not
+     */
+    private fun shouldAnimate(point: PointF) = point.y > visibleBound.top && point.y < visibleBound.bottom
+
+    private fun transitionTo(state: State, duration: Long = 300) {
+        if (state == currentState) return
+        animator?.apply {
+            cancel()
+        }
+
+        animator = ValueAnimator.ofFloat(0.0f, 1.0f)
+            .apply {
+                this.duration = duration
+                interpolator = FastOutSlowInInterpolator()
+                val top = visibleBound.top
+                //If dest state is FLAT init points are curved else flat
+                val points =
+                    if (state == State.FLAT) curvedBoundPoints.clone()
+                    else flatBoundPoints.clone()
+                val dest =
+                    if (state == State.FLAT) flatBoundPoints else curvedBoundPoints
+
+                val dy = FloatArray(points.size) { index ->
+                    if (state == State.FLAT) {
+                        points[index].y - dest[index].y
+                    } else {
+                        dest[index].y - points[index].y
+                    }
+                }
+                addUpdateListener {
+                    val factor =
+                        if (state == State.FLAT) 1.0f - it.animatedValue as Float else it.animatedValue as Float
+                    points.forEachIndexed { index, point ->
+                        //                        if (shouldAnimate(point)) {
+                        if (!isCorner(point))
+                            point.y = top + dy[index] * factor
+//                        }
+                    }
+                    currentPoints = points
+                }
+                addListener(object : SimpleAnimatorListener() {
+                    override fun onAnimationStart(animation: Animator?, isReverse: Boolean) {
+                        super.onAnimationStart(animation, isReverse)
+                        updateInvisibleMenuItem(state)
+                    }
+
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        currentState = state
+                    }
+                })
+                start()
+            }
+    }
+
+    private fun toggleState(state: State) = if (state == State.FLAT) State.CURVED else State.FLAT
+
+
+    public fun toggleTransition() {
+        transitionTo(toggleState(currentState))
+    }
+
+//    fun removeShiftMode() {
+//        val menuView = getChildAt(0) as BottomNavigationMenuView
+//        try {
+//            val shiftingMode = menuView.javaClass.getDeclaredField("mShiftingMode")
+//            shiftingMode.isAccessible = true
+//            shiftingMode.setBoolean(menuView, false)
+//            shiftingMode.isAccessible = false
+//            for (i in 0 until menuView.childCount) {
+//                val item = menuView.getChildAt(i) as BottomNavigationItemView
+//                item.setShifting(false)
+//                item.setShiftingMode(false)
+//                // set once again checked value, so view will be updated
+//                item.setChecked(item.itemData.isChecked)
+//            }
+//        } catch (e: NoSuchFieldException) {
+//            Log.e("ERROR NO SUCH FIELD", "Unable to get shift mode field")
+//        } catch (e: IllegalAccessException) {
+//            Log.e("ERROR ILLEGAL ALG", "Unable to change value of shift mode")
+//        }
+//    }
+
+    private fun MutableList<PointF>.clone(): MutableList<PointF> {
+        return mutableListOf<PointF>().also { list ->
+            forEach { point ->
+                list.add(PointF(point.x, point.y))
+            }
+        }
+    }
+
+    override fun setOnNavigationItemSelectedListener(listener: OnNavigationItemSelectedListener?) {
+        itemSelectedListener = listener
+    }
+
+    private enum class State {
+        CURVED, FLAT
+    }
+
+    private open class SimpleAnimatorListener : Animator.AnimatorListener {
+
+        override fun onAnimationRepeat(animation: Animator?) {
+
+        }
+
+        override fun onAnimationEnd(animation: Animator?) {
+        }
+
+        override fun onAnimationCancel(animation: Animator?) {
+        }
+
+        override fun onAnimationStart(animation: Animator?) {
+        }
+    }
+
+    //TODO cancel anim on size change
+    //TODO transition without anim
 }

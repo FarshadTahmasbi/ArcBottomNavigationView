@@ -8,21 +8,19 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-        <!--<TextView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:gravity="center"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="Hello World!"-->
-            <!--android:padding="16dp"-->
-            <!--app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--app:layout_constraintLeft_toLeftOf="parent"-->
-            <!--app:layout_constraintRight_toRightOf="parent"-->
-            <!--app:layout_constraintTop_toTopOf="parent" />-->
 
+    <Button
+        android:id="@+id/toggle"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:text="toggle"
+        android:layout_height="wrap_content" />
 
 
     <com.androidisland.bottomnavsample.MyView
         android:id="@+id/bottomNavView"
+        android:layout_gravity="bottom"
+        app:itemHorizontalTranslationEnabled="true"
         android:background="#3F51B5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,4 +33,3 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
