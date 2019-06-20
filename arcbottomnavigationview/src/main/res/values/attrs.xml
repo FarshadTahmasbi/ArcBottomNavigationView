@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ArcBottomNavigationView">
+
+        <attr name="ai_buttonRadius" format="dimension|reference" />
+        <attr name="ai_buttonMargin" format="dimension|reference" />
+        <attr name="ai_buttonIcon" format="reference" />
+        <attr name="ai_buttonSize" format="dimension|reference" />
+        <attr name="ai_buttonStrokeWidth" format="dimension|reference" />
+        <attr name="ai_buttonStrokeColor" format="color|reference" />
+
+    </declare-styleable>
+</resources>

@@ -1,8 +1,7 @@
-package com.androidisland.bottomnavsample
+package com.androidisland.views.sample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.activity_main.*
 

@@ -1,4 +1,4 @@
-package com.androidisland.bottomnavsample
+package com.androidisland.views
 
 import org.junit.Test
 

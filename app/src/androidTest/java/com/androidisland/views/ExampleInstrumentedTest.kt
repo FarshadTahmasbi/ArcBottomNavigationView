@@ -1,4 +1,4 @@
-package com.androidisland.bottomnavsample
+package com.androidisland.views
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4

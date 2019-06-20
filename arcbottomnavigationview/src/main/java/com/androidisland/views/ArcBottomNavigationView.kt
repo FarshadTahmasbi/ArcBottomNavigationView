@@ -1,4 +1,4 @@
-package com.androidisland.bottomnavsample
+package com.androidisland.views
 
 import android.animation.Animator
 import android.animation.ValueAnimator
@@ -20,16 +20,17 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlin.random.Random
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
 
 
-class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(context, attrs) {
+class ArcBottomNavigationView : BottomNavigationView {
 
     companion object {
+        private const val DEFAULT_RADIUS = 1
         private const val CURVE_MAX_POINTS = 100
     }
 
-    private var currentState: State = State.FLAT
+    private var currentState: State =
+        State.FLAT
     //        set(value) {
 //            field = value
 //            updateInvisibleMenuItem(field)
@@ -76,12 +77,14 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
         strokeWidth = 12.0f
     }
 
-    init {
+    constructor(context: Context) : this(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
+            : super(context, attrs, 0){
         ViewCompat.setElevation(this, 0.0f)
-//        postDelayed({
-//            transitionTo(if (currentState == State.FLAT) State.CURVED else State.FLAT)
-//        }, 1000)
+
     }
+
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -92,18 +95,19 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
         currentPoints = if (currentState == State.FLAT) flatBoundPoints else curvedBoundPoints
     }
 
+    override fun isItemHorizontalTranslationEnabled(): Boolean {
+        return false
+    }
+
+    override fun setItemHorizontalTranslationEnabled(itemHorizontalTranslationEnabled: Boolean) {
+
+    }
+
     @SuppressLint("RestrictedApi")
     override fun onFinishInflate() {
         super.onFinishInflate()
-        isItemHorizontalTranslationEnabled = false
         children.forEach {
             if (it is BottomNavigationMenuView) {
-//                it.layoutTransition = null
-                it.children.forEach { itemView ->
-                    if (itemView is BottomNavigationItemView) {
-                        itemView.setShifting(false)
-                    }
-                }
                 (it.layoutParams as LayoutParams).gravity = Gravity.BOTTOM
                 return@forEach
             }
@@ -140,10 +144,6 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
                 icon = item.icon
             }
         }
-        updateInvisibleMenuItem(currentState)
-    }
-
-    private fun addInvisibleMenuItem() {
         val invisibleItem = menu.findItem(invisibleMenuItemId)
         if (invisibleItem == null) {
             menu.add(Menu.NONE, invisibleMenuItemId, menu.size / 2, "").apply {
@@ -153,17 +153,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
             }
             if (selectedItemIndex >= menu.size / 2) selectedItemIndex++
         }
-        Log.d("test123", "add:selected ---> $selectedItemIndex")
-        menu.getItem(selectedItemIndex).isChecked = true
-    }
-
-    private fun removeInvisibleMenuItem() {
-        val invisibleItem = menu.findItem(invisibleMenuItemId)
-        invisibleItem?.apply {
-            if (selectedItemIndex > menu.size / 2) selectedItemIndex--
-            menu.removeItem(invisibleItem.itemId)
-            menu.getItem(selectedItemIndex).isChecked = true
-        }
+        updateInvisibleMenuItem(currentState)
     }
 
     private fun invisibleItemExists() = menu.size() % 2 == 1
@@ -171,8 +161,8 @@ class MyView(context: Context?, attrs: AttributeSet?) : BottomNavigationView(con
     private fun invisibleMenuItem() = findViewById<View>(invisibleMenuItemId)
 
     private fun updateInvisibleMenuItem(state: State) {
-        if (state == State.FLAT) removeInvisibleMenuItem()
-        else addInvisibleMenuItem()
+        val item = menu.findItem(invisibleMenuItemId)
+        item.isVisible = state != State.FLAT
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
