@@ -95,6 +95,15 @@ class ArcBottomNavigationView : BottomNavigationView {
                     supportBackgroundTintList = ColorStateList.valueOf(value)
             }
         }
+
+    var buttonRippleColor: Int = Color.TRANSPARENT
+        set(value) {
+            field = value
+            button?.apply {
+                rippleColor = ColorStateList.valueOf(value)
+            }
+        }
+
     private var currentState: State = State.FLAT
     var state: State = currentState
         set(value) {
@@ -121,6 +130,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     private val invisibleMenuItemId = Random(System.currentTimeMillis()).nextInt()
     private val navMenu = menu as MenuBuilder
     private var itemSelectedListener: OnNavigationItemSelectedListener? = null
+    var buttonClickListener: ((arcBottomNavView: ArcBottomNavigationView) -> Unit)? = null
     private var selectedItemIndex = 0
 
     private val curvePath = Path()
@@ -166,6 +176,8 @@ class ArcBottomNavigationView : BottomNavigationView {
             buttonStrokeColor = ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonStrokeColor, buttonStrokeColor)
             buttonBackgroundTint =
                 ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonBackgroundTint, buttonBackgroundTint)
+            buttonRippleColor =
+                ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonRippleColor, buttonRippleColor)
             buttonIconTint = ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonIconTint, buttonIconTint)
             val state = ta.getInt(R.styleable.ArcBottomNavigationView_ai_state, 1)
             currentState = if (state == 1) State.FLAT else State.ARC
@@ -197,10 +209,10 @@ class ArcBottomNavigationView : BottomNavigationView {
                 strokeColor = ColorStateList.valueOf(buttonStrokeColor)
                 if (buttonBackgroundTint != Color.TRANSPARENT)
                     supportBackgroundTintList = ColorStateList.valueOf(buttonBackgroundTint)
+                rippleColor = ColorStateList.valueOf(buttonRippleColor)
                 visibility = if (currentState == State.FLAT) View.INVISIBLE else View.VISIBLE
                 setOnClickListener {
-                    //TODO add listener...
-                    log("clicked!")
+                    buttonClickListener?.invoke(this@ArcBottomNavigationView)
                 }
                 setTextColor(Color.TRANSPARENT)
                 addView(this, 1)
@@ -443,7 +455,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     private fun shouldAnimate(point: PointF) = point.y > visibleBound.top && point.y < visibleBound.bottom
 
     private fun transitionTo(state: State, duration: Long = DEFAULT_ANIM_DURATION) {
-        if (state == currentState) return
+        if (state == currentState || animator?.isRunning == true) return
         animator?.apply {
             cancel()
         }

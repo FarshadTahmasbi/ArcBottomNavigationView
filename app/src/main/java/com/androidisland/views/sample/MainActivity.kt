@@ -3,6 +3,7 @@ package com.androidisland.views.sample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import com.androidisland.views.ArcBottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -19,6 +20,10 @@ class MainActivity : AppCompatActivity() {
         bottomNavView.setOnNavigationItemSelectedListener {
             Log.d("test123", "selected!")
             true
+        }
+        bottomNavView.buttonClickListener = {
+            Log.d("test123", "Button clicked!")
+            it.state = ArcBottomNavigationView.State.FLAT
         }
         state_switch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {

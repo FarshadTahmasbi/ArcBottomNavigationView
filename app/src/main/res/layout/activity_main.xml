@@ -69,6 +69,7 @@
         app:ai_buttonStrokeWidth="0dp"
         app:ai_buttonBackgroundTint="#f00"
         app:ai_buttonStrokeColor="#000"
+        app:ai_buttonRippleColor="#fff"
         app:itemIconTint="@drawable/selector_icon_tint"
         app:itemTextColor="#000"
         app:layout_constraintBottom_toBottomOf="parent"
