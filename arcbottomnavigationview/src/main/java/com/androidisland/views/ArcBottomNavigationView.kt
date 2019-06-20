@@ -5,8 +5,10 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -19,22 +21,26 @@ import androidx.core.view.size
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
 import kotlin.random.Random
 
 
 class ArcBottomNavigationView : BottomNavigationView {
 
     companion object {
-        private const val DEFAULT_RADIUS = 1
+        //Dimens are in Dp
+        private const val DEFAULT_BUTTON_SIZE = 40
+        private const val DEFAULT_BUTTON_MARGIN = 16
+        private const val DEFAULT_BUTTON_STROKE_WIDTH = 0
+        private const val DEFAULT_BUTTON_STROKE_COLOR = Color.TRANSPARENT
+
         private const val CURVE_MAX_POINTS = 100
     }
 
-    private var currentState: State =
-        State.FLAT
-    //        set(value) {
-//            field = value
-//            updateInvisibleMenuItem(field)
-//        }
+    private lateinit var button: MaterialButton
+    private lateinit var menuView: BottomNavigationMenuView
+
+    private var currentState: State = State.FLAT
     private var animator: ValueAnimator? = null
     private lateinit var visibleBound: RectF
     //Keeps curved state points, only change when size changed
@@ -79,10 +85,50 @@ class ArcBottomNavigationView : BottomNavigationView {
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
-            : super(context, attrs, 0){
-        ViewCompat.setElevation(this, 0.0f)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
+            : super(context, attrs, 0) {
+        var buttonSize = DEFAULT_BUTTON_SIZE.toPixel()
+        var buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
+        var buttonIcon: Drawable? = null
+        var buttonIconSize = buttonSize
+        var buttonStrokeWidth = DEFAULT_BUTTON_STROKE_WIDTH.toPixel()
+        var buttonStrokeColor = DEFAULT_BUTTON_STROKE_COLOR
 
+        val typedValue = TypedValue()
+        val typedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(R.attr.colorAccent))
+        var buttonBackgroundTint = typedArray.getColor(0, Color.BLACK)
+        typedArray.recycle()
+
+        attrs?.apply {
+            val ta = context.obtainStyledAttributes(this, R.styleable.ArcBottomNavigationView)
+            buttonSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonSize, buttonSize)
+            buttonMargin = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonMargin, buttonMargin)
+            buttonIcon = ta.getDrawable(R.styleable.ArcBottomNavigationView_ai_buttonIcon)
+            buttonIconSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonIconSize, buttonSize)
+            buttonIconSize = Math.max(buttonSize, buttonIconSize)
+            buttonStrokeWidth =
+                ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonStrokeWidth, buttonStrokeWidth)
+            buttonStrokeColor = ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonStrokeColor, buttonStrokeColor)
+            buttonBackgroundTint =
+                ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonBackgroundTint, buttonBackgroundTint)
+            ta.recycle()
+        }
+
+
+        menuView = getChildAt(0) as BottomNavigationMenuView
+        //Creates button
+        button = MaterialButton(context, null, R.attr.buttonStyle)
+            .apply {
+                buttonSize = radius * 2
+                layoutParams = LayoutParams(buttonSize.toInt(), buttonSize.toInt(), Gravity.TOP or Gravity.CENTER)
+                cornerRadius = (buttonSize / 2).toInt()
+                setTextColor(Color.WHITE)
+                addView(this)
+            }
+    }
+
+    init {
+        ViewCompat.setElevation(this, 0.0f)
     }
 
 
@@ -171,20 +217,19 @@ class ArcBottomNavigationView : BottomNavigationView {
     }
 
     override fun onDraw(canvas: Canvas?) {
-//        canvas?.apply {
-//            drawPath(currentPath, controlPaint)
-//        }
-        canvas?.clipPath(currentPath)
+        canvas?.apply {
+            drawPath(currentPath, controlPaint)
+        }
+//        canvas?.clipPath(currentPath)
         super.onDraw(canvas)
     }
 
     override fun dispatchDraw(canvas: Canvas?) {
-        canvas?.clipPath(currentPath)
         super.dispatchDraw(canvas)
     }
 
     override fun draw(canvas: Canvas?) {
-        canvas?.clipPath(currentPath)
+//        canvas?.clipPath(currentPath)
 //        canvas?.apply {
 //            clipPath(currentPath)
 //        }

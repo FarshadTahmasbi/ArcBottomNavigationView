@@ -36,7 +36,7 @@
         app:backgroundTint="#f00"
         app:cornerRadius="18dp"
         app:icon="@drawable/ic_home_black"
-        app:iconSize="24dp"
+        app:iconSize="40dp"
         app:iconPadding="0dp"
         app:iconTint="#673AB7"
         android:visibility="visible"
@@ -46,20 +46,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:layout_width="wrap_content"
-        app:elevation="0dp"
-        app:fabCustomSize="40dp"
-        android:visibility="invisible"
-        app:useCompatPadding="false"
-        app:backgroundTintMode="src_in"
-        app:backgroundTint="#3F51B5"
-        android:src="@drawable/google"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--app:elevation="0dp"-->
+        <!--app:fabCustomSize="40dp"-->
+        <!--android:visibility="invisible"-->
+        <!--app:useCompatPadding="false"-->
+        <!--app:backgroundTintMode="src_in"-->
+        <!--app:backgroundTint="#3F51B5"-->
+        <!--android:src="@drawable/google"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
 
 
     <com.androidisland.views.ArcBottomNavigationView
@@ -68,6 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="#3F51B5"
+        app:ai_buttonIcon="@drawable/google"
         app:itemIconTint="@drawable/selector_icon_tint"
         app:itemTextColor="#000"
         app:layout_constraintBottom_toBottomOf="parent"
