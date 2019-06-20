@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -13,6 +14,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.view.ViewCompat
 import androidx.core.view.children
@@ -24,23 +26,82 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import kotlin.random.Random
 
-
+@SuppressLint("RestrictedApi")
 class ArcBottomNavigationView : BottomNavigationView {
 
     companion object {
+        private const val TAG = "ArcBottomNavigationView"
         //Dimens are in Dp
-        private const val DEFAULT_BUTTON_SIZE = 40
-        private const val DEFAULT_BUTTON_MARGIN = 16
+        private const val DEFAULT_BUTTON_SIZE = 56
+        private const val DEFAULT_BUTTON_MARGIN = 8
         private const val DEFAULT_BUTTON_STROKE_WIDTH = 0
         private const val DEFAULT_BUTTON_STROKE_COLOR = Color.TRANSPARENT
 
+        private const val DEFAULT_ANIM_DURATION = 200L
         private const val CURVE_MAX_POINTS = 100
     }
 
-    private lateinit var button: MaterialButton
-    private lateinit var menuView: BottomNavigationMenuView
+    private var button: MaterialButton? = null
+    private var menuView: BottomNavigationMenuView
 
+    //TODO mamrgin property, invlaidate draw...
+    private var buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
+    private var buttonRadius = (DEFAULT_BUTTON_SIZE / 2).toPixel()
+    var buttonIcon: Drawable? = null
+        set(value) {
+            field = value
+            button?.apply {
+                icon = value
+            }
+        }
+    var buttonIconSize: Float = buttonRadius
+        set(value) {
+            field = value
+            button?.apply {
+                iconSize = value.toInt()
+            }
+        }
+
+    var buttonStrokeWidth: Float = 0.0f
+        set(value) {
+            field = value
+            button?.apply {
+                strokeWidth = value.toInt()
+            }
+        }
+
+    var buttonStrokeColor: Int = Color.TRANSPARENT
+        set(value) {
+            field = value
+            button?.apply {
+                strokeColor = ColorStateList.valueOf(value)
+            }
+        }
+
+    var buttonIconTint: Int = Color.TRANSPARENT
+        set(value) {
+            field = value
+            button?.apply {
+                if (value != Color.TRANSPARENT)
+                    iconTint = ColorStateList.valueOf(value)
+            }
+        }
+
+    var buttonBackgroundTint: Int = Color.TRANSPARENT
+        set(value) {
+            field = value
+            button?.apply {
+                if (value != Color.TRANSPARENT)
+                    supportBackgroundTintList = ColorStateList.valueOf(value)
+            }
+        }
     private var currentState: State = State.FLAT
+    var state: State = currentState
+        set(value) {
+            field = value
+            transitionTo(value)
+        }
+
     private var animator: ValueAnimator? = null
     private lateinit var visibleBound: RectF
     //Keeps curved state points, only change when size changed
@@ -61,11 +122,6 @@ class ArcBottomNavigationView : BottomNavigationView {
     private val navMenu = menu as MenuBuilder
     private var itemSelectedListener: OnNavigationItemSelectedListener? = null
     private var selectedItemIndex = 0
-
-
-    val controlPath = Path()
-    val margin = 20.0f
-    val radius = 80.0f
 
     private val curvePath = Path()
     private val rectPath = Path()
@@ -88,47 +144,68 @@ class ArcBottomNavigationView : BottomNavigationView {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, 0) {
         var buttonSize = DEFAULT_BUTTON_SIZE.toPixel()
-        var buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
-        var buttonIcon: Drawable? = null
-        var buttonIconSize = buttonSize
-        var buttonStrokeWidth = DEFAULT_BUTTON_STROKE_WIDTH.toPixel()
-        var buttonStrokeColor = DEFAULT_BUTTON_STROKE_COLOR
+        buttonIconSize = buttonSize / 2
+        buttonStrokeWidth = DEFAULT_BUTTON_STROKE_WIDTH.toPixel()
+        buttonStrokeColor = DEFAULT_BUTTON_STROKE_COLOR
 
         val typedValue = TypedValue()
         val typedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(R.attr.colorAccent))
-        var buttonBackgroundTint = typedArray.getColor(0, Color.BLACK)
+        buttonBackgroundTint = typedArray.getColor(0, Color.BLACK)
         typedArray.recycle()
 
         attrs?.apply {
             val ta = context.obtainStyledAttributes(this, R.styleable.ArcBottomNavigationView)
             buttonSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonSize, buttonSize)
             buttonMargin = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonMargin, buttonMargin)
+            if (buttonMargin < DEFAULT_BUTTON_MARGIN.toPixel()) buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
             buttonIcon = ta.getDrawable(R.styleable.ArcBottomNavigationView_ai_buttonIcon)
-            buttonIconSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonIconSize, buttonSize)
-            buttonIconSize = Math.max(buttonSize, buttonIconSize)
+            buttonIconSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonIconSize, buttonSize / 2)
+            buttonIconSize = Math.min(buttonSize / 2, buttonIconSize)
             buttonStrokeWidth =
                 ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonStrokeWidth, buttonStrokeWidth)
             buttonStrokeColor = ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonStrokeColor, buttonStrokeColor)
             buttonBackgroundTint =
                 ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonBackgroundTint, buttonBackgroundTint)
+            buttonIconTint = ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonIconTint, buttonIconTint)
+            val state = ta.getInt(R.styleable.ArcBottomNavigationView_ai_state, 1)
+            currentState = if (state == 1) State.FLAT else State.ARC
             ta.recycle()
         }
+        buttonRadius = buttonSize / 2
 
-
+        ViewCompat.setElevation(this, 0.0f)
         menuView = getChildAt(0) as BottomNavigationMenuView
+        menuView.layoutParams.apply {
+            (this as LayoutParams).gravity = Gravity.BOTTOM
+        }
+        menuView.bringToFront()
         //Creates button
-        button = MaterialButton(context, null, R.attr.buttonStyle)
+        val contextWrapper = ContextThemeWrapper(context, R.style.ArcTheme)
+        button = MaterialButton(contextWrapper, null, R.attr.materialButtonStyle)
             .apply {
-                buttonSize = radius * 2
                 layoutParams = LayoutParams(buttonSize.toInt(), buttonSize.toInt(), Gravity.TOP or Gravity.CENTER)
                 cornerRadius = (buttonSize / 2).toInt()
-                setTextColor(Color.WHITE)
-                addView(this)
+                gravity = Gravity.CENTER
+                iconPadding = 0
+                iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
+                iconSize = buttonIconSize.toInt()
+                icon = buttonIcon
+                iconTintMode = PorterDuff.Mode.SRC_IN
+                if (buttonIconTint != Color.TRANSPARENT)
+                    iconTint = ColorStateList.valueOf(buttonIconTint)
+                strokeWidth = buttonStrokeWidth.toInt()
+                strokeColor = ColorStateList.valueOf(buttonStrokeColor)
+                if (buttonBackgroundTint != Color.TRANSPARENT)
+                    supportBackgroundTintList = ColorStateList.valueOf(buttonBackgroundTint)
+                visibility = if (currentState == State.FLAT) View.INVISIBLE else View.VISIBLE
+                setOnClickListener {
+                    //TODO add listener...
+                    log("clicked!")
+                }
+                setTextColor(Color.TRANSPARENT)
+                addView(this, 1)
             }
-    }
-
-    init {
-        ViewCompat.setElevation(this, 0.0f)
+        ViewCompat.setElevation(button!!, 0.0f)
     }
 
 
@@ -152,12 +229,6 @@ class ArcBottomNavigationView : BottomNavigationView {
     @SuppressLint("RestrictedApi")
     override fun onFinishInflate() {
         super.onFinishInflate()
-        children.forEach {
-            if (it is BottomNavigationMenuView) {
-                (it.layoutParams as LayoutParams).gravity = Gravity.BOTTOM
-                return@forEach
-            }
-        }
         if (menu.size % 2 != 0) throw IllegalStateException("Item menu size should be even")
         regenerateMenu()
         navMenu.setCallback(object : MenuBuilder.Callback {
@@ -213,32 +284,17 @@ class ArcBottomNavigationView : BottomNavigationView {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        setMeasuredDimension(width, measuredHeight + radius.toInt())
-    }
-
-    override fun onDraw(canvas: Canvas?) {
-        canvas?.apply {
-            drawPath(currentPath, controlPaint)
-        }
-//        canvas?.clipPath(currentPath)
-        super.onDraw(canvas)
+        setMeasuredDimension(width, measuredHeight + buttonRadius.toInt())
     }
 
     override fun dispatchDraw(canvas: Canvas?) {
+        canvas?.restore()
         super.dispatchDraw(canvas)
     }
 
     override fun draw(canvas: Canvas?) {
-//        canvas?.clipPath(currentPath)
-//        canvas?.apply {
-//            clipPath(currentPath)
-//        }
-//        background?.apply {
-//            if (this is ColorDrawable) {
-//                controlPaint.color = color
-//                canvas?.drawPath(currentPath, controlPaint)
-//            }
-//        }
+        canvas?.save()
+        canvas?.clipPath(currentPath)
         super.draw(canvas)
     }
 
@@ -252,7 +308,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     private fun isCorner(point: PointF) = isCorner(floatArrayOf(point.x, point.y))
 
     private fun getVisibleBound(): RectF {
-        return RectF(0.0f, radius, width.toFloat(), height.toFloat())
+        return RectF(0.0f, buttonRadius, width.toFloat(), height.toFloat())
     }
 
 
@@ -266,7 +322,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     }
 
     private fun curveStart(width: Float) =
-        PointF(width / 2 - 1.2f * radius - 4.0f * margin, getVisibleCorners()[0].y)
+        PointF(width / 2 - 1.2f * buttonRadius - 4.0f * buttonMargin, getVisibleCorners()[0].y)
 
     private fun curveEnd(width: Float) = PointF().apply {
         val curveStart = curveStart(width)
@@ -278,9 +334,10 @@ class ArcBottomNavigationView : BottomNavigationView {
         return Path().apply {
             val topLeft = getVisibleCorners()[0]
             val start = curveStart(width)
-            val p2 = PointF(width / 2.toFloat() - 0.8f * radius, topLeft.y)
-            val p3 = PointF(width / 2 - 1.0f * radius - margin * .8f, topLeft.y + radius + margin)
-            val p4 = PointF(width / 2.toFloat(), topLeft.y + radius + margin)
+            val p2 = PointF(width / 2.toFloat() - 0.8f * buttonRadius, topLeft.y)
+            val p3 =
+                PointF(width / 2 - 1.0f * buttonRadius - buttonMargin * .8f, topLeft.y + buttonRadius + buttonMargin)
+            val p4 = PointF(width / 2.toFloat(), topLeft.y + buttonRadius + buttonMargin)
 
             moveTo(start.x, start.y)
             cubicTo(p2.x, p2.y, p3.x, p3.y, p4.x, p4.y)
@@ -385,7 +442,7 @@ class ArcBottomNavigationView : BottomNavigationView {
      */
     private fun shouldAnimate(point: PointF) = point.y > visibleBound.top && point.y < visibleBound.bottom
 
-    private fun transitionTo(state: State, duration: Long = 300) {
+    private fun transitionTo(state: State, duration: Long = DEFAULT_ANIM_DURATION) {
         if (state == currentState) return
         animator?.apply {
             cancel()
@@ -411,58 +468,40 @@ class ArcBottomNavigationView : BottomNavigationView {
                     }
                 }
                 addUpdateListener {
-                    val factor =
-                        if (state == State.FLAT) 1.0f - it.animatedValue as Float else it.animatedValue as Float
+                    val animatedValue = it.animatedValue as Float
+                    val factor = if (state == State.FLAT) 1.0f - animatedValue else animatedValue
                     points.forEachIndexed { index, point ->
-                        //                        if (shouldAnimate(point)) {
                         if (!isCorner(point))
                             point.y = top + dy[index] * factor
-//                        }
                     }
                     currentPoints = points
+                    animateButton(animatedValue, state)
+                    onArcAnimationUpdate(animatedValue, currentState, state)
                 }
                 addListener(object : SimpleAnimatorListener() {
                     override fun onAnimationStart(animation: Animator?, isReverse: Boolean) {
                         super.onAnimationStart(animation, isReverse)
                         updateInvisibleMenuItem(state)
+                        onArcAnimationStart(currentState, state)
                     }
 
                     override fun onAnimationEnd(animation: Animator?) {
                         super.onAnimationEnd(animation)
+                        val from = currentState
                         currentState = state
+                        onArcAnimationEnd(from, state)
                     }
                 })
                 start()
             }
     }
 
-    private fun toggleState(state: State) = if (state == State.FLAT) State.CURVED else State.FLAT
+    private fun toggleState(state: State) = if (state == State.FLAT) State.ARC else State.FLAT
 
 
     public fun toggleTransition() {
         transitionTo(toggleState(currentState))
     }
-
-//    fun removeShiftMode() {
-//        val menuView = getChildAt(0) as BottomNavigationMenuView
-//        try {
-//            val shiftingMode = menuView.javaClass.getDeclaredField("mShiftingMode")
-//            shiftingMode.isAccessible = true
-//            shiftingMode.setBoolean(menuView, false)
-//            shiftingMode.isAccessible = false
-//            for (i in 0 until menuView.childCount) {
-//                val item = menuView.getChildAt(i) as BottomNavigationItemView
-//                item.setShifting(false)
-//                item.setShiftingMode(false)
-//                // set once again checked value, so view will be updated
-//                item.setChecked(item.itemData.isChecked)
-//            }
-//        } catch (e: NoSuchFieldException) {
-//            Log.e("ERROR NO SUCH FIELD", "Unable to get shift mode field")
-//        } catch (e: IllegalAccessException) {
-//            Log.e("ERROR ILLEGAL ALG", "Unable to change value of shift mode")
-//        }
-//    }
 
     private fun MutableList<PointF>.clone(): MutableList<PointF> {
         return mutableListOf<PointF>().also { list ->
@@ -476,8 +515,28 @@ class ArcBottomNavigationView : BottomNavigationView {
         itemSelectedListener = listener
     }
 
-    private enum class State {
-        CURVED, FLAT
+    protected fun onArcAnimationStart(from: State, to: State) {
+    }
+
+    protected fun onArcAnimationUpdate(offset: Float, from: State, to: State) {
+    }
+
+    protected fun onArcAnimationEnd(from: State, to: State) {
+
+    }
+
+    private fun animateButton(offset: Float, to: State) {
+        val scale = if (to == State.FLAT) 1.0f - offset else offset
+        if (to == State.ARC && offset == 0.0f) button?.visibility = View.VISIBLE
+        button?.scaleX = scale
+        button?.scaleY = scale
+        if (to == State.FLAT && offset == 1.0f) button?.visibility = View.INVISIBLE
+    }
+
+    private fun log(msg: String) = Log.d(TAG, msg)
+
+    enum class State {
+        ARC, FLAT
     }
 
     private open class SimpleAnimatorListener : Animator.AnimatorListener {
@@ -497,5 +556,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     }
 
     //TODO cancel anim on size change
-    //TODO transition without anim
+    //TODO draw edit mode problem
+    //TODO measure problem in frame layout
+    //TODO clip replace with draw to use antialias
 }

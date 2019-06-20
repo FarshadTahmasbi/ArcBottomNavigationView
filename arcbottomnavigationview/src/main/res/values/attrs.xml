@@ -2,13 +2,17 @@
 <resources>
 
     <declare-styleable name="ArcBottomNavigationView">
-
         <attr name="ai_buttonSize" format="dimension|reference" />
         <attr name="ai_buttonMargin" format="dimension|reference" />
         <attr name="ai_buttonIcon" format="reference" />
         <attr name="ai_buttonIconSize" format="dimension|reference" />
+        <attr name="ai_buttonIconTint" format="color|reference" />
         <attr name="ai_buttonStrokeWidth" format="dimension|reference" />
         <attr name="ai_buttonStrokeColor" format="color|reference" />
         <attr name="ai_buttonBackgroundTint" format="color|reference" />
+        <attr name="ai_state">
+            <enum name="flat" value="1"/>
+            <enum name="arc" value="2"/>
+        </attr>
     </declare-styleable>
 </resources>

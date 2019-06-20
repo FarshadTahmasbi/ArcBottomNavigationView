@@ -10,7 +10,7 @@
 
 
     <Button
-        android:id="@+id/toggle"
+        android:id="@+id/toggle_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -20,46 +20,41 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/state_switch"
+        android:text="Select state"
+        android:checked="false"
+        android:layout_margin="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toggle_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/scroll_button"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:gravity="center"
-        app:iconGravity="textStart"
         android:insetLeft="0dp"
         android:insetTop="0dp"
         android:insetRight="0dp"
         android:insetBottom="0dp"
-        app:strokeWidth="0dp"
         android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
-        app:backgroundTint="#f00"
-        app:cornerRadius="18dp"
-        app:icon="@drawable/ic_home_black"
-        app:iconSize="40dp"
-        app:iconPadding="0dp"
-        app:iconTint="#673AB7"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:backgroundTint="#009688"
+        app:cornerRadius="20dp"
+        app:icon="@drawable/ic_home_black"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="20dp"
+        app:iconTint="#FFEB3B"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton-->
-        <!--android:layout_width="wrap_content"-->
-        <!--app:elevation="0dp"-->
-        <!--app:fabCustomSize="40dp"-->
-        <!--android:visibility="invisible"-->
-        <!--app:useCompatPadding="false"-->
-        <!--app:backgroundTintMode="src_in"-->
-        <!--app:backgroundTint="#3F51B5"-->
-        <!--android:src="@drawable/google"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintLeft_toLeftOf="parent"-->
-        <!--app:layout_constraintRight_toRightOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent" />-->
+        app:strokeWidth="0dp" />
 
 
     <com.androidisland.views.ArcBottomNavigationView
@@ -69,6 +64,11 @@
         android:layout_gravity="bottom"
         android:background="#3F51B5"
         app:ai_buttonIcon="@drawable/google"
+        app:ai_state="flat"
+        app:ai_buttonMargin="0dp"
+        app:ai_buttonStrokeWidth="0dp"
+        app:ai_buttonBackgroundTint="#f00"
+        app:ai_buttonStrokeColor="#000"
         app:itemIconTint="@drawable/selector_icon_tint"
         app:itemTextColor="#000"
         app:layout_constraintBottom_toBottomOf="parent"

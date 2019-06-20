@@ -2,7 +2,9 @@ package com.androidisland.views.sample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
+import com.androidisland.views.ArcBottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -11,12 +13,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         ViewGroup.LayoutParams.MATCH_PARENT
-        toggle.setOnClickListener {
+        toggle_btn.setOnClickListener {
             bottomNavView.toggleTransition()
         }
         bottomNavView.setOnNavigationItemSelectedListener {
-//            Log.d("test123", "selected!")
+            Log.d("test123", "selected!")
             true
+        }
+        state_switch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                buttonView.text = "Arc is on"
+                bottomNavView.state = ArcBottomNavigationView.State.ARC
+            } else {
+                buttonView.text = "Arc is off"
+                bottomNavView.state = ArcBottomNavigationView.State.FLAT
+
+            }
         }
     }
 }
