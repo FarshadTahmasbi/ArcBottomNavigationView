@@ -31,20 +31,38 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content" />
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:id="@+id/bottomNav"
+        android:layout_height="wrap_content"
+        app:itemHorizontalTranslationEnabled="true"
+        android:layout_gravity="bottom"
+        android:background="#4CAF50"
+        app:itemIconTint="@drawable/selector_icon_tint"
+        app:itemTextColor="#fff"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/arcBottomNav"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:menu="@menu/bottom_nav_items" />
+
+
+
     <com.androidisland.views.ArcBottomNavigationView
-        android:id="@+id/bottomNavView"
+        android:id="@+id/arcBottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:itemHorizontalTranslationEnabled="true"
         android:layout_gravity="bottom"
-        android:background="#3F51B5"
+        android:background="#4CAF50"
         app:ai_buttonIcon="@drawable/google"
         app:ai_state="arc"
         app:ai_buttonStrokeWidth="0dp"
-        app:ai_buttonBackgroundTint="#f00"
+        app:ai_buttonBackgroundTint="#CDDC39"
         app:ai_buttonStrokeColor="#000"
         app:ai_buttonRippleColor="#fff"
         app:itemIconTint="@drawable/selector_icon_tint"
-        app:itemTextColor="#000"
+        app:itemTextColor="#fff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

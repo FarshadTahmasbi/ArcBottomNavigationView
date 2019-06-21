@@ -1,10 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_home"
+        android:orderInCategory="1"
         android:title="@string/menu_home"
         android:icon="@drawable/ic_home_black"
         />
     <item
+        android:orderInCategory="1"
         android:id="@+id/menu_search"
         android:title="@string/menu_search"
         android:icon="@drawable/ic_search_black"
@@ -12,11 +14,15 @@
 
 
     <item
+        android:id="@+id/menu_thumb"
+        android:orderInCategory="10"
         android:title="@string/menu_home"
         android:icon="@drawable/ic_thumb_up_black_24dp"
         />
 
     <item
+        android:id="@+id/menu_directions"
+        android:orderInCategory="10"
         android:title="@string/menu_home"
         android:icon="@drawable/ic_directions_car_black_24dp"
         />

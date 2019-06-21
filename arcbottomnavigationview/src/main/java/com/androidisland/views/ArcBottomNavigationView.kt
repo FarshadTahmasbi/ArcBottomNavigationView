@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.*
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
@@ -14,6 +15,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.ColorRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.view.ViewCompat
@@ -48,11 +50,7 @@ class ArcBottomNavigationView : BottomNavigationView {
         set(value) {
             if (field != value) {
                 field = value
-                if (width > 0) {
-                    arcBoundPoints = createArcBoundPoints(width.toFloat())
-                    flatBoundPoints = createFlatBoundPoints(arcBoundPoints)
-                    currentPoints = if (currentState == State.FLAT) flatBoundPoints else arcBoundPoints
-                }
+                updatePoints(width)
             }
         }
     private var buttonRadius = (DEFAULT_BUTTON_SIZE / 2).toPixel()
@@ -121,7 +119,10 @@ class ArcBottomNavigationView : BottomNavigationView {
         }
 
     private var animator: ValueAnimator? = null
-    private lateinit var visibleBound: RectF
+    private var visibleBound: RectF = RectF(0.0f, 0.0f, 0.0f, 0.0f)
+    private val visibleBoundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+    }
     //Keeps curved state points, only change when size changed
     private lateinit var arcBoundPoints: MutableList<PointF>
     //Keeps flat state points, only change when size changed
@@ -141,7 +142,6 @@ class ArcBottomNavigationView : BottomNavigationView {
     private var itemSelectedListener: OnNavigationItemSelectedListener? = null
     var buttonClickListener: ((arcBottomNavView: ArcBottomNavigationView) -> Unit)? = null
     var arcAnimationListener: ArcAnimationListener? = null
-    private var selectedItemIndex = 0
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -219,9 +219,15 @@ class ArcBottomNavigationView : BottomNavigationView {
         super.onSizeChanged(w, h, oldw, oldh)
 
         visibleBound = getVisibleBound()
-        arcBoundPoints = createArcBoundPoints(w.toFloat())
-        flatBoundPoints = createFlatBoundPoints(arcBoundPoints)
-        currentPoints = if (currentState == State.FLAT) flatBoundPoints else arcBoundPoints
+        updatePoints(w)
+    }
+
+    private fun updatePoints(width: Int) {
+        if (width > 0) {
+            arcBoundPoints = createArcBoundPoints(width.toFloat())
+            flatBoundPoints = createFlatBoundPoints(arcBoundPoints)
+            currentPoints = if (currentState == State.FLAT) flatBoundPoints else arcBoundPoints
+        }
     }
 
     override fun isItemHorizontalTranslationEnabled(): Boolean {
@@ -243,8 +249,6 @@ class ArcBottomNavigationView : BottomNavigationView {
 
             override fun onMenuItemSelected(menu: MenuBuilder?, item: MenuItem?): Boolean {
                 item?.apply {
-                    selectedItemIndex = menu?.children?.indexOf(item) ?: -1
-                    Log.d("test123", "selected=====> $selectedItemIndex")
                     if (itemId != invisibleMenuItemId) {
                         itemSelectedListener?.onNavigationItemSelected(this)
                     }
@@ -271,10 +275,8 @@ class ArcBottomNavigationView : BottomNavigationView {
         if (invisibleItem == null) {
             menu.add(Menu.NONE, invisibleMenuItemId, menu.size / 2, "").apply {
                 isEnabled = false
-                isChecked = false
-                isCheckable = false
+                isVisible = false
             }
-            if (selectedItemIndex >= menu.size / 2) selectedItemIndex++
         }
         updateInvisibleMenuItem(currentState)
     }
@@ -288,19 +290,53 @@ class ArcBottomNavigationView : BottomNavigationView {
         item.isVisible = state != State.FLAT
     }
 
+    private fun getBackgroundColor(): Int? {
+        return background.run {
+            if (this is ColorDrawable) color
+            else null
+        }
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        setMeasuredDimension(width, measuredHeight + buttonRadius.toInt())
+        menuView.measure(
+            widthMeasureSpec,
+            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+        )
+        setMeasuredDimension(menuView.measuredWidth, menuView.measuredHeight + buttonRadius.toInt())
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        menuView.layout(
+            visibleBound.left.toInt(),
+            visibleBound.top.toInt(),
+            visibleBound.right.toInt(),
+            visibleBound.bottom.toInt()
+        )
+        button?.layout(
+            (visibleBound.right / 2 - buttonRadius).toInt(),
+            (visibleBound.top - buttonRadius).toInt(),
+            (visibleBound.right / 2 + buttonRadius).toInt(),
+            (visibleBound.top + buttonRadius).toInt()
+        )
     }
 
     override fun dispatchDraw(canvas: Canvas?) {
-        canvas?.restore()
+        canvas?.apply {
+            restore()
+            if (!isInEditMode) {
+                getBackgroundColor()?.let { visibleBoundPaint.color = it }
+                drawPath(currentPath, visibleBoundPaint)
+            }
+        }
         super.dispatchDraw(canvas)
     }
 
     override fun draw(canvas: Canvas?) {
-        canvas?.save()
-        canvas?.clipPath(currentPath)
+        canvas?.apply {
+            save()
+            if (!isInEditMode)
+                clipPath(currentPath)
+        }
         super.draw(canvas)
     }
 
@@ -508,7 +544,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     private fun toggleState(state: State) = if (state == State.FLAT) State.ARC else State.FLAT
 
 
-    public fun toggleTransition() {
+    public fun toggleState() {
         transitionTo(toggleState(currentState))
     }
 
