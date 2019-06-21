@@ -44,8 +44,17 @@ class ArcBottomNavigationView : BottomNavigationView {
     private var button: MaterialButton? = null
     private var menuView: BottomNavigationMenuView
 
-    //TODO mamrgin property, invlaidate draw...
-    private var buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
+    var buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
+        set(value) {
+            if (field != value) {
+                field = value
+                if (width > 0) {
+                    arcBoundPoints = createArcBoundPoints(width.toFloat())
+                    flatBoundPoints = createFlatBoundPoints(arcBoundPoints)
+                    currentPoints = if (currentState == State.FLAT) flatBoundPoints else arcBoundPoints
+                }
+            }
+        }
     private var buttonRadius = (DEFAULT_BUTTON_SIZE / 2).toPixel()
     var buttonIcon: Drawable? = null
         set(value) {
@@ -114,7 +123,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     private var animator: ValueAnimator? = null
     private lateinit var visibleBound: RectF
     //Keeps curved state points, only change when size changed
-    private lateinit var curvedBoundPoints: MutableList<PointF>
+    private lateinit var arcBoundPoints: MutableList<PointF>
     //Keeps flat state points, only change when size changed
     private lateinit var flatBoundPoints: MutableList<PointF>
     //Keeps points for current state, every time we assign it a list
@@ -131,23 +140,8 @@ class ArcBottomNavigationView : BottomNavigationView {
     private val navMenu = menu as MenuBuilder
     private var itemSelectedListener: OnNavigationItemSelectedListener? = null
     var buttonClickListener: ((arcBottomNavView: ArcBottomNavigationView) -> Unit)? = null
+    var arcAnimationListener: ArcAnimationListener? = null
     private var selectedItemIndex = 0
-
-    private val curvePath = Path()
-    private val rectPath = Path()
-    //For debug purpose only
-    private val circle = Path()
-
-    private val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0x55000000
-        style = Paint.Style.FILL
-    }
-
-    val controlPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.BLUE
-        style = Paint.Style.FILL
-        strokeWidth = 12.0f
-    }
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -190,7 +184,7 @@ class ArcBottomNavigationView : BottomNavigationView {
         menuView.layoutParams.apply {
             (this as LayoutParams).gravity = Gravity.BOTTOM
         }
-        menuView.bringToFront()
+
         //Creates button
         val contextWrapper = ContextThemeWrapper(context, R.style.ArcTheme)
         button = MaterialButton(contextWrapper, null, R.attr.materialButtonStyle)
@@ -225,9 +219,9 @@ class ArcBottomNavigationView : BottomNavigationView {
         super.onSizeChanged(w, h, oldw, oldh)
 
         visibleBound = getVisibleBound()
-        curvedBoundPoints = createCurveBoundPoints(w.toFloat())
-        flatBoundPoints = createFlatBoundPoints(curvedBoundPoints)
-        currentPoints = if (currentState == State.FLAT) flatBoundPoints else curvedBoundPoints
+        arcBoundPoints = createArcBoundPoints(w.toFloat())
+        flatBoundPoints = createFlatBoundPoints(arcBoundPoints)
+        currentPoints = if (currentState == State.FLAT) flatBoundPoints else arcBoundPoints
     }
 
     override fun isItemHorizontalTranslationEnabled(): Boolean {
@@ -333,19 +327,19 @@ class ArcBottomNavigationView : BottomNavigationView {
         )
     }
 
-    private fun curveStart(width: Float) =
+    private fun arcStart(width: Float) =
         PointF(width / 2 - 1.2f * buttonRadius - 4.0f * buttonMargin, getVisibleCorners()[0].y)
 
-    private fun curveEnd(width: Float) = PointF().apply {
-        val curveStart = curveStart(width)
+    private fun arcEnd(width: Float) = PointF().apply {
+        val curveStart = arcStart(width)
         x = width - curveStart.x
         y = curveStart.y
     }
 
-    private fun createCurvePath(width: Float): Path {
+    private fun createArcPath(width: Float): Path {
         return Path().apply {
             val topLeft = getVisibleCorners()[0]
-            val start = curveStart(width)
+            val start = arcStart(width)
             val p2 = PointF(width / 2.toFloat() - 0.8f * buttonRadius, topLeft.y)
             val p3 =
                 PointF(width / 2 - 1.0f * buttonRadius - buttonMargin * .8f, topLeft.y + buttonRadius + buttonMargin)
@@ -356,7 +350,7 @@ class ArcBottomNavigationView : BottomNavigationView {
 
             val p5 = PointF(width - p3.x, p3.y)
             val p6 = PointF(width - p2.x, p2.y)
-            val end = curveEnd(width)
+            val end = arcEnd(width)
             cubicTo(p5.x, p5.y, p6.x, p6.y, end.x, end.y)
         }
     }
@@ -367,7 +361,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     private fun createTopLeftPath(width: Float): Path {
         return Path().apply {
             val topLeft = getVisibleCorners()[0]
-            val curveStart = curveStart(width)
+            val curveStart = arcStart(width)
             moveTo(topLeft.x, topLeft.y)
             lineTo(curveStart.x, curveStart.y)
         }
@@ -379,7 +373,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     private fun createTopRightPath(width: Float): Path {
         return Path().apply {
             val topRight = getVisibleCorners()[1]
-            val curveEnd = curveEnd(width)
+            val curveEnd = arcEnd(width)
             moveTo(curveEnd.x, curveEnd.y)
             lineTo(topRight.x, topRight.y)
         }
@@ -398,28 +392,28 @@ class ArcBottomNavigationView : BottomNavigationView {
         }
     }
 
-    private fun createCurveBoundPoints(width: Float): MutableList<PointF> {
+    private fun createArcBoundPoints(width: Float): MutableList<PointF> {
         return mutableListOf<PointF>().apply {
 
             val corners = getVisibleCorners()
-            val curveStart = curveStart(width)
-            val curveEnd = curveEnd(width)
+            val arcStart = arcStart(width)
+            val arcEnd = arcEnd(width)
 
             //top-right segment
             add(PointF(corners[0].x, corners[1].y))
-            add(PointF(curveStart.x, curveStart.y))
+            add(PointF(arcStart.x, arcStart.y))
 
             //Curve points
             val pm = PathMeasure()
             val point = FloatArray(2) { 0.0f }
-            pm.setPath(createCurvePath(width), false)
+            pm.setPath(createArcPath(width), false)
             for (index in 0..CURVE_MAX_POINTS) {
                 pm.getPosTan(pm.length * index / CURVE_MAX_POINTS.toFloat(), point, null)
                 add(PointF(point[0], point[1]))
             }
 
             //top-left segment
-            add(PointF(curveEnd.x, curveEnd.y))
+            add(PointF(arcEnd.x, arcEnd.y))
             add(PointF(corners[1].x, corners[1].y))
 
 
@@ -467,10 +461,10 @@ class ArcBottomNavigationView : BottomNavigationView {
                 val top = visibleBound.top
                 //If dest state is FLAT init points are curved else flat
                 val points =
-                    if (state == State.FLAT) curvedBoundPoints.clone()
+                    if (state == State.FLAT) arcBoundPoints.clone()
                     else flatBoundPoints.clone()
                 val dest =
-                    if (state == State.FLAT) flatBoundPoints else curvedBoundPoints
+                    if (state == State.FLAT) flatBoundPoints else arcBoundPoints
 
                 val dy = FloatArray(points.size) { index ->
                     if (state == State.FLAT) {
@@ -488,12 +482,14 @@ class ArcBottomNavigationView : BottomNavigationView {
                     }
                     currentPoints = points
                     animateButton(animatedValue, state)
+                    arcAnimationListener?.onArcAnimationUpdate(animatedValue, currentState, state)
                     onArcAnimationUpdate(animatedValue, currentState, state)
                 }
                 addListener(object : SimpleAnimatorListener() {
                     override fun onAnimationStart(animation: Animator?, isReverse: Boolean) {
                         super.onAnimationStart(animation, isReverse)
                         updateInvisibleMenuItem(state)
+                        arcAnimationListener?.onArcAnimationStart(currentState, state)
                         onArcAnimationStart(currentState, state)
                     }
 
@@ -501,6 +497,7 @@ class ArcBottomNavigationView : BottomNavigationView {
                         super.onAnimationEnd(animation)
                         val from = currentState
                         currentState = state
+                        arcAnimationListener?.onArcAnimationEnd(from, state)
                         onArcAnimationEnd(from, state)
                     }
                 })
@@ -565,6 +562,12 @@ class ArcBottomNavigationView : BottomNavigationView {
 
         override fun onAnimationStart(animation: Animator?) {
         }
+    }
+
+    interface ArcAnimationListener {
+        fun onArcAnimationStart(from: State, to: State)
+        fun onArcAnimationUpdate(offset: Float, from: State, to: State)
+        fun onArcAnimationEnd(from: State, to: State)
     }
 
     //TODO cancel anim on size change

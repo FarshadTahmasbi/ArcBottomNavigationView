@@ -31,32 +31,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content" />
 
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/scroll_button"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:gravity="center"
-        android:insetLeft="0dp"
-        android:insetTop="0dp"
-        android:insetRight="0dp"
-        android:insetBottom="0dp"
-        android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
-        android:visibility="visible"
-        app:backgroundTint="#009688"
-        app:cornerRadius="20dp"
-        app:icon="@drawable/ic_home_black"
-        app:iconGravity="textStart"
-        app:iconPadding="0dp"
-        app:iconSize="20dp"
-        app:iconTint="#FFEB3B"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavView"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:strokeWidth="0dp" />
-
-
     <com.androidisland.views.ArcBottomNavigationView
         android:id="@+id/bottomNavView"
         android:layout_width="match_parent"
@@ -64,8 +38,7 @@
         android:layout_gravity="bottom"
         android:background="#3F51B5"
         app:ai_buttonIcon="@drawable/google"
-        app:ai_state="flat"
-        app:ai_buttonMargin="0dp"
+        app:ai_state="arc"
         app:ai_buttonStrokeWidth="0dp"
         app:ai_buttonBackgroundTint="#f00"
         app:ai_buttonStrokeColor="#000"

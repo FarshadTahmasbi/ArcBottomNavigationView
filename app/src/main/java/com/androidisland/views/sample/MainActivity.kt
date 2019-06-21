@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.androidisland.views.ArcBottomNavigationView
+import com.androidisland.views.toPixel
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -23,8 +24,10 @@ class MainActivity : AppCompatActivity() {
         }
         bottomNavView.buttonClickListener = {
             Log.d("test123", "Button clicked!")
-            it.state = ArcBottomNavigationView.State.FLAT
+//            it.state = ArcBottomNavigationView.State.FLAT
+            it.buttonMargin = 16.toPixel()
         }
+
         state_switch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 buttonView.text = "Arc is on"
