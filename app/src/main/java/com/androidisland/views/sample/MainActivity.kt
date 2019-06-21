@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import com.androidisland.views.ArcBottomNavigationView
+import com.androidisland.views.toPixel
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {

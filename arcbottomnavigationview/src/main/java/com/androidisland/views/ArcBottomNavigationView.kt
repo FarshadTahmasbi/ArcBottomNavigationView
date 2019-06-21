@@ -15,11 +15,9 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.annotation.ColorRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.view.ViewCompat
-import androidx.core.view.children
 import androidx.core.view.iterator
 import androidx.core.view.size
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -54,6 +52,12 @@ class ArcBottomNavigationView : BottomNavigationView {
             }
         }
     private var buttonRadius = (DEFAULT_BUTTON_SIZE / 2).toPixel()
+        set(value) {
+            field = value
+            button?.apply {
+                cornerRadius = value.toInt()
+            }
+        }
     var buttonIcon: Drawable? = null
         set(value) {
             field = value
@@ -63,7 +67,7 @@ class ArcBottomNavigationView : BottomNavigationView {
         }
     var buttonIconSize: Float = buttonRadius
         set(value) {
-            field = value
+            field = Math.min(buttonSize / 2, value)
             button?.apply {
                 iconSize = value.toInt()
             }
@@ -111,6 +115,14 @@ class ArcBottomNavigationView : BottomNavigationView {
             }
         }
 
+    private var buttonSize: Float = DEFAULT_BUTTON_SIZE.toPixel()
+        set(value) {
+            field = value
+            buttonRadius = value / 2
+            buttonIconSize = value / 2
+            requestLayout()
+        }
+
     private var currentState: State = State.FLAT
     var state: State = currentState
         set(value) {
@@ -124,9 +136,9 @@ class ArcBottomNavigationView : BottomNavigationView {
         style = Paint.Style.FILL
     }
     //Keeps curved state points, only change when size changed
-    private lateinit var arcBoundPoints: MutableList<PointF>
+    private var arcBoundPoints: MutableList<PointF> = mutableListOf()
     //Keeps flat state points, only change when size changed
-    private lateinit var flatBoundPoints: MutableList<PointF>
+    private var flatBoundPoints: MutableList<PointF> = mutableListOf()
     //Keeps points for current state, every time we assign it a list
     //it changes currentPath and redraws view
     //assignment should only happen in animation updates
@@ -139,7 +151,6 @@ class ArcBottomNavigationView : BottomNavigationView {
     private var currentPath = Path()
     private val invisibleMenuItemId = Random(System.currentTimeMillis()).nextInt()
     private val navMenu = menu as MenuBuilder
-    private var itemSelectedListener: OnNavigationItemSelectedListener? = null
     var buttonClickListener: ((arcBottomNavView: ArcBottomNavigationView) -> Unit)? = null
     var arcAnimationListener: ArcAnimationListener? = null
 
@@ -147,7 +158,7 @@ class ArcBottomNavigationView : BottomNavigationView {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, 0) {
-        var buttonSize = DEFAULT_BUTTON_SIZE.toPixel()
+        buttonSize = DEFAULT_BUTTON_SIZE.toPixel()
         buttonIconSize = buttonSize / 2
         buttonStrokeWidth = DEFAULT_BUTTON_STROKE_WIDTH.toPixel()
         buttonStrokeColor = DEFAULT_BUTTON_STROKE_COLOR
@@ -184,6 +195,8 @@ class ArcBottomNavigationView : BottomNavigationView {
         menuView.layoutParams.apply {
             (this as LayoutParams).gravity = Gravity.BOTTOM
         }
+        if (menu.size % 2 != 0) throw IllegalStateException("Item menu size should be even")
+        regenerateMenu()
 
         //Creates button
         val contextWrapper = ContextThemeWrapper(context, R.style.ArcTheme)
@@ -235,27 +248,6 @@ class ArcBottomNavigationView : BottomNavigationView {
     }
 
     override fun setItemHorizontalTranslationEnabled(itemHorizontalTranslationEnabled: Boolean) {
-
-    }
-
-    @SuppressLint("RestrictedApi")
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        if (menu.size % 2 != 0) throw IllegalStateException("Item menu size should be even")
-        regenerateMenu()
-        navMenu.setCallback(object : MenuBuilder.Callback {
-            override fun onMenuModeChange(menu: MenuBuilder?) {
-            }
-
-            override fun onMenuItemSelected(menu: MenuBuilder?, item: MenuItem?): Boolean {
-                item?.apply {
-                    if (itemId != invisibleMenuItemId) {
-                        itemSelectedListener?.onNavigationItemSelected(this)
-                    }
-                }
-                return false
-            }
-        })
     }
 
     private fun regenerateMenu() {
@@ -320,15 +312,17 @@ class ArcBottomNavigationView : BottomNavigationView {
         )
     }
 
-    override fun dispatchDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
         canvas?.apply {
             restore()
+            getBackgroundColor()?.let { visibleBoundPaint.color = it }
             if (!isInEditMode) {
-                getBackgroundColor()?.let { visibleBoundPaint.color = it }
                 drawPath(currentPath, visibleBoundPaint)
+            } else {
+                drawPath(createEditModePath(), visibleBoundPaint)
             }
         }
-        super.dispatchDraw(canvas)
     }
 
     override fun draw(canvas: Canvas?) {
@@ -336,6 +330,8 @@ class ArcBottomNavigationView : BottomNavigationView {
             save()
             if (!isInEditMode)
                 clipPath(currentPath)
+            else
+                clipPath(createEditModePath())
         }
         super.draw(canvas)
     }
@@ -388,6 +384,42 @@ class ArcBottomNavigationView : BottomNavigationView {
             val p6 = PointF(width - p2.x, p2.y)
             val end = arcEnd(width)
             cubicTo(p5.x, p5.y, p6.x, p6.y, end.x, end.y)
+        }
+    }
+
+    /**
+     * Creates a path to show in edit mode for layout preview
+     */
+    private fun createEditModePath(): Path {
+        return Path().apply {
+            if (currentState == State.FLAT) {
+                moveTo(visibleBound.left, visibleBound.top)
+                lineTo(visibleBound.right, visibleBound.top)
+                lineTo(visibleBound.right, visibleBound.bottom)
+                lineTo(visibleBound.left, visibleBound.bottom)
+                close()
+            } else if (currentState == State.ARC) {
+                val corners = getVisibleCorners()
+                val topLeft = corners[0]
+                val start = arcStart(width.toFloat())
+                val p2 = PointF(width / 2.toFloat() - 0.8f * buttonRadius, topLeft.y)
+                val p3 =
+                    PointF(width / 2 - 1.0f * buttonRadius - buttonMargin * .8f, topLeft.y + buttonRadius + buttonMargin)
+                val p4 = PointF(width / 2.toFloat(), topLeft.y + buttonRadius + buttonMargin)
+
+                moveTo(topLeft.x, topLeft.y)
+                lineTo(start.x, start.y)
+                cubicTo(p2.x, p2.y, p3.x, p3.y, p4.x, p4.y)
+
+                val p5 = PointF(width - p3.x, p3.y)
+                val p6 = PointF(width - p2.x, p2.y)
+                val end = arcEnd(width.toFloat())
+                cubicTo(p5.x, p5.y, p6.x, p6.y, end.x, end.y)
+                lineTo(corners[1].x, corners[1].y)
+                lineTo(corners[2].x, corners[2].y)
+                lineTo(corners[3].x, corners[3].y)
+                close()
+            }
         }
     }
 
@@ -554,10 +586,6 @@ class ArcBottomNavigationView : BottomNavigationView {
                 list.add(PointF(point.x, point.y))
             }
         }
-    }
-
-    override fun setOnNavigationItemSelectedListener(listener: OnNavigationItemSelectedListener?) {
-        itemSelectedListener = listener
     }
 
     protected fun onArcAnimationStart(from: State, to: State) {
