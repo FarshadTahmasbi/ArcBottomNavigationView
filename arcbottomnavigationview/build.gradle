@@ -1,6 +1,26 @@
+apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 
+def _versionName = '1.0.0'
+def _versionCode = 1
+def _groupId = 'com.androidisland.views'
+def _artifactId = 'arcbottomnavigationview'
+def _userOrg = 'androidisland'
+def _repoName = 'ArcBottomNavigationView'
+def _desc = ''
+def _git = ''
+
+publish {
+    userOrg = _userOrg
+    repoName = _repoName
+    groupId = _groupId
+    artifactId = _artifactId
+    publishVersion = _versionName
+    desc = _desc
+    website = _git
+}
 
 android {
     compileSdkVersion 28

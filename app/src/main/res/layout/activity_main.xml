@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ff0"
+    android:background="#FFEB3B"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -30,21 +30,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toggle_btn" />
-
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="16dp"
-        android:background="#4CAF50"
-        app:itemIconTint="@drawable/selector_icon_tint"
-        app:itemTextColor="#fff"
-        app:layout_constraintBottom_toTopOf="@id/arcBottomNav"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav_items" />
 
 
     <com.androidisland.views.ArcBottomNavigationView

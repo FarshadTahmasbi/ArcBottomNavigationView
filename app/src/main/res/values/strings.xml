@@ -2,4 +2,6 @@
     <string name="app_name">BottomNav Sample</string>
     <string name="menu_search">Search</string>
     <string name="menu_home">Home</string>
+    <string name="menu_thumb">Favorites</string>
+    <string name="menu_directions">Direction</string>
 </resources>

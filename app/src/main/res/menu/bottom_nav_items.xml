@@ -16,14 +16,14 @@
     <item
         android:id="@+id/menu_thumb"
         android:orderInCategory="10"
-        android:title="@string/menu_home"
+        android:title="@string/menu_thumb"
         android:icon="@drawable/ic_thumb_up_black_24dp"
         />
 
     <item
         android:id="@+id/menu_directions"
         android:orderInCategory="10"
-        android:title="@string/menu_home"
+        android:title="@string/menu_directions"
         android:icon="@drawable/ic_directions_car_black_24dp"
         />
 
