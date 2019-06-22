@@ -26,6 +26,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import kotlin.random.Random
 
+/**
+ * Created by Farshad Tahmasbi on June 22,2019.
+ * Copyright(c) 2019, All rights reserved.
+ * https://github.com/FarshadTahmasbi/ArcBottomNavigationView
+ * Email: farshad.tmb@gmail.com
+ */
+
 @SuppressLint("RestrictedApi")
 class ArcBottomNavigationView : BottomNavigationView {
 
@@ -404,7 +411,10 @@ class ArcBottomNavigationView : BottomNavigationView {
                 val start = arcStart(width.toFloat())
                 val p2 = PointF(width / 2.toFloat() - 0.8f * buttonRadius, topLeft.y)
                 val p3 =
-                    PointF(width / 2 - 1.0f * buttonRadius - buttonMargin * .8f, topLeft.y + buttonRadius + buttonMargin)
+                    PointF(
+                        width / 2 - 1.0f * buttonRadius - buttonMargin * .8f,
+                        topLeft.y + buttonRadius + buttonMargin
+                    )
                 val p4 = PointF(width / 2.toFloat(), topLeft.y + buttonRadius + buttonMargin)
 
                 moveTo(topLeft.x, topLeft.y)
