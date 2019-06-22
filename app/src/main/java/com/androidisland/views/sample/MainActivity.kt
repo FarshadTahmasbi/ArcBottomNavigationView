@@ -6,6 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.androidisland.views.ArcBottomNavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 
+/**
+ * Created by Farshad Tahmasbi on June 22,2019.
+ * Copyright(c) 2019, All rights reserved.
+ * https://github.com/FarshadTahmasbi/ArcBottomNavigationView
+ * Email: farshad.tmb@gmail.com
+ */
+
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
