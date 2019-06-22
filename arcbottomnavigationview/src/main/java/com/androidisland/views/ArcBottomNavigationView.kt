@@ -33,7 +33,7 @@ import kotlin.random.Random
  */
 
 @SuppressLint("RestrictedApi")
-class ArcBottomNavigationView : BottomNavigationView {
+open class ArcBottomNavigationView : BottomNavigationView {
 
     companion object {
         private const val TAG = "ArcBottomNavigationView"
