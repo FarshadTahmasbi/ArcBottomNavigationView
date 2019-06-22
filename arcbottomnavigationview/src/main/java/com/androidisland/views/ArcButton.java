@@ -113,7 +113,9 @@ public class ArcButton extends MaterialButton {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
         setMeasuredDimension(width, height);
-        iconLeft = (getMeasuredWidth() - icon.getIntrinsicWidth()) / 2;
+
+        int iconWidth = this.iconSize != 0 ? this.iconSize : this.icon.getIntrinsicWidth();
+        iconLeft = (getMeasuredWidth() - iconWidth) / 2;
         updateIcon();
     }
 }

@@ -51,7 +51,8 @@ class MainActivity : AppCompatActivity() {
 
         size_seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                arcBottomNav.buttonSize = progress.toPixel()
+//                arcBottomNav.buttonSize = progress.toPixel()
+                arcBottomNav.buttonIconSize = progress.toPixel()
 //                (arcBottomNav.getChildAt(1) as MaterialButton).apply {
 //                    iconSize = progress.toPixel().toInt()
 //                    iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START

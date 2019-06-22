@@ -78,7 +78,7 @@
         app:ai_buttonIconTint="#FFF"
         app:ai_buttonRippleColor="#fff"
         app:ai_buttonSize="64dp"
-        app:ai_buttonIconSize="24dp"
+        app:ai_buttonIconSize="40dp"
         app:ai_buttonStrokeColor="#000"
         app:ai_buttonStrokeWidth="0dp"
         app:ai_state="arc"
