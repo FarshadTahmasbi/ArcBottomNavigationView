@@ -20,8 +20,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        private val MIN_BUTTON_SIZE = 24.0f
-        private const val MAX_BUTTON_SIZE = 64.0f
+        private val MIN_SIZE = 24.0f
+        private const val MAX_SIZE = 64.0f
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +50,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        button_size_seek.max = (MAX_SIZE - MIN_SIZE).toInt()
         button_size_seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
                 icon_size_seek.max = progress
-                val size = MIN_BUTTON_SIZE + progress
+                val size = MIN_SIZE + progress
                 arc_bottom_nav.buttonSize = size.toPixel()
                 button_size_text.text = "Button size:${size.toInt()} dp"
             }
@@ -64,12 +65,12 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(p0: SeekBar?) {
             }
         })
-        button_size_seek.progress = (arc_bottom_nav.buttonSize.toDip() - MIN_BUTTON_SIZE).toInt()
+        button_size_seek.progress = (arc_bottom_nav.buttonSize.toDip() - MIN_SIZE).toInt()
 
-
+        icon_size_seek.max = (MAX_SIZE - MIN_SIZE).toInt()
         icon_size_seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
-                val size = MIN_BUTTON_SIZE + progress
+                val size = MIN_SIZE + progress
                 arc_bottom_nav.buttonIconSize = size.toPixel()
                 icon_size_text.text = "Icon size:${size.toInt()} dp"
             }
@@ -80,7 +81,7 @@ class MainActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(p0: SeekBar?) {
             }
         })
-        icon_size_seek.progress = (arc_bottom_nav.buttonIconSize.toDip() - MIN_BUTTON_SIZE).toInt()
+        icon_size_seek.progress = (arc_bottom_nav.buttonIconSize.toDip() - MIN_SIZE).toInt()
 
 
 
