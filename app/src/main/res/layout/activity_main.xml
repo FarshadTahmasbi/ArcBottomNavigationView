@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFEB3B"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -97,7 +96,7 @@
         android:layout_gravity="bottom"
         android:background="#4CAF50"
         app:ai_buttonBackgroundTint="#673AB7"
-        app:ai_buttonIcon="@drawable/ic_send_black_24dp"
+        app:ai_buttonIcon="@drawable/ic_create_black_24dp"
         app:ai_buttonIconSize="32dp"
         app:ai_buttonIconTint="#FFF"
         app:ai_buttonRippleColor="#fff"
