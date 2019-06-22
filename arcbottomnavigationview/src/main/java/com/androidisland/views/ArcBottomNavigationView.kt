@@ -56,7 +56,6 @@ open class ArcBottomNavigationView : BottomNavigationView {
             field = value
             buttonRadius = value / 2
             if (buttonIconSize > field) buttonIconSize = field
-//            buttonIconSize = value / 2
             requestLayout()
         }
 

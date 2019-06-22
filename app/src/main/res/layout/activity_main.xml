@@ -8,87 +8,100 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <ImageView
-        android:scaleType="center"
-        android:src="@drawable/pic"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_width="0dp"
-        android:layout_height="0dp" />
-
-    <androidx.appcompat.widget.AppCompatSeekBar
-        android:id="@+id/size_seek"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="24dp"
-        android:max="64"
-        android:min="32"
-        android:progress="64"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialButton" />
-
-    <Button
-        android:id="@+id/toggle_btn"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/hv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="toggle"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".5" />
+
+    <TextView
+        android:id="@+id/selection_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:gravity="center"
+        android:text="Selection"
+        android:textAllCaps="true"
+        android:textColor="#000"
+        android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/state_switch"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:checked="false"
-        android:text="Select state"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toggle_btn" />
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:checked="true"
+        android:text="Arc State"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@id/selection_text"
+        app:layout_constraintRight_toRightOf="@id/selection_text"
+        app:layout_constraintTop_toBottomOf="@id/selection_text" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/materialButton"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="16dp"
-        android:insetLeft="0dp"
-        android:insetTop="0dp"
-        android:insetRight="0dp"
-        android:insetBottom="0dp"
-        android:theme="@style/Theme.MaterialComponents.NoActionBar"
-        app:backgroundTint="@color/colorAccent"
-        app:cornerRadius="20dp"
-        app:iconSize="16dp"
-        app:iconPadding="0dp"
-        app:iconGravity="textStart"
-        app:icon="@drawable/chevron_up_box"
-        app:iconTint="#fff"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+    <TextView
+        android:id="@+id/button_size_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:gravity="left|center_vertical"
+        android:text="Button size"
+        android:textColor="#000"
+        app:layout_constraintLeft_toLeftOf="@id/state_switch"
+        app:layout_constraintRight_toRightOf="@id/hv"
         app:layout_constraintTop_toBottomOf="@id/state_switch" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/button_size_seek"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="32"
+        android:progress="0"
+        app:layout_constraintBottom_toBottomOf="@id/button_size_text"
+        app:layout_constraintLeft_toLeftOf="@id/hv"
+        app:layout_constraintRight_toRightOf="@id/selection_text"
+        app:layout_constraintTop_toTopOf="@id/button_size_text" />
+
+    <TextView
+        android:id="@+id/icon_size_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:gravity="left|center_vertical"
+        android:text="Icon size"
+        android:textColor="#000"
+        app:layout_constraintLeft_toLeftOf="@id/button_size_text"
+        app:layout_constraintRight_toRightOf="@id/hv"
+        app:layout_constraintTop_toBottomOf="@id/button_size_text" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/icon_size_seek"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="32"
+        android:progress="0"
+        app:layout_constraintBottom_toBottomOf="@id/icon_size_text"
+        app:layout_constraintLeft_toLeftOf="@id/hv"
+        app:layout_constraintRight_toRightOf="@id/selection_text"
+        app:layout_constraintTop_toTopOf="@id/icon_size_text" />
 
 
     <com.androidisland.views.ArcBottomNavigationView
-        android:id="@+id/arcBottomNav"
+        android:id="@+id/arc_bottom_nav"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="#4CAF50"
         app:ai_buttonBackgroundTint="#673AB7"
-        app:ai_buttonIcon="@drawable/chevron_up_box"
+        app:ai_buttonIcon="@drawable/ic_send_black_24dp"
+        app:ai_buttonIconSize="32dp"
         app:ai_buttonIconTint="#FFF"
         app:ai_buttonRippleColor="#fff"
-        app:ai_buttonSize="64dp"
-        app:ai_buttonIconSize="40dp"
+        app:ai_buttonSize="56dp"
         app:ai_buttonStrokeColor="#000"
         app:ai_buttonStrokeWidth="0dp"
         app:ai_state="arc"
