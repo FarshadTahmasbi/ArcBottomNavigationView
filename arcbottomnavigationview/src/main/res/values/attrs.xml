@@ -11,6 +11,7 @@
         <attr name="ai_buttonStrokeColor" format="color|reference" />
         <attr name="ai_buttonBackgroundTint" format="color|reference" />
         <attr name="ai_buttonRippleColor" format="color|reference" />
+        <attr name="ai_fontPath" format="string|reference" />
         <attr name="ai_state">
             <enum name="flat" value="1" />
             <enum name="arc" value="2" />

@@ -15,6 +15,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.iterator
 import androidx.core.view.setPadding
@@ -48,7 +49,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
     }
 
     private var button: ArcButton? = null
-    private var menuView: BottomNavigationMenuView
+    private var menuView: BottomNavigationMenuView? = null
 
     var buttonSize: Float = DEFAULT_BUTTON_SIZE.toPixel()
         set(value) {
@@ -130,6 +131,26 @@ open class ArcBottomNavigationView : BottomNavigationView {
             }
         }
 
+    var typeface: Typeface? = null
+        set(value) {
+            field = value
+            value?.let {
+                menuView?.apply {
+                    for (index in 0 until childCount) {
+                        val item = getChildAt(index)
+                        val smallItemText = item.findViewById<View>(com.google.android.material.R.id.smallLabel)
+                        if (smallItemText is TextView) {
+                            smallItemText.typeface = value
+                        }
+                        val largeItemText = item.findViewById<View>(com.google.android.material.R.id.largeLabel)
+                        if (largeItemText is TextView) {
+                            largeItemText.typeface = value
+                            largeItemText.setPadding(0, 0, 0, 0)
+                        }
+                    }
+                }
+            }
+        }
 
     private var currentState: State = State.FLAT
     var state: State = currentState
@@ -168,6 +189,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
         buttonStrokeWidth = DEFAULT_BUTTON_STROKE_WIDTH.toPixel()
         buttonStrokeColor = DEFAULT_BUTTON_STROKE_COLOR
 
+        var typeface: Typeface? = null
         val typedValue = TypedValue()
         val typedArray = context.obtainStyledAttributes(typedValue.data, intArrayOf(R.attr.colorAccent))
         buttonBackgroundTint = typedArray.getColor(0, Color.BLACK)
@@ -190,16 +212,23 @@ open class ArcBottomNavigationView : BottomNavigationView {
             buttonIconTint = ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonIconTint, buttonIconTint)
             val state = ta.getInt(R.styleable.ArcBottomNavigationView_ai_state, 1)
             currentState = if (state == 1) State.FLAT else State.ARC
+            if (ta.hasValue(R.styleable.ArcBottomNavigationView_ai_fontPath)) {
+                typeface = Typeface.createFromAsset(
+                    context.assets,
+                    ta.getString(R.styleable.ArcBottomNavigationView_ai_fontPath)
+                )
+            }
             ta.recycle()
         }
 
         ViewCompat.setElevation(this, 0.0f)
         menuView = getChildAt(0) as BottomNavigationMenuView
-        menuView.layoutParams.apply {
+        menuView?.layoutParams.apply {
             (this as LayoutParams).gravity = Gravity.BOTTOM
         }
         if (menu.size % 2 != 0) throw IllegalStateException("Item menu size should be even")
         regenerateMenu()
+        this.typeface = typeface
 
         //Creates button
         button = ArcButton(context)
@@ -293,19 +322,25 @@ open class ArcBottomNavigationView : BottomNavigationView {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        menuView.measure(
-            widthMeasureSpec,
-            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
-        )
+        var width = 0
+        var height = buttonRadius.toInt()
+        menuView?.apply {
+            measure(
+                widthMeasureSpec,
+                MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+            )
+            width += measuredWidth
+            height += measuredHeight
+        }
         button?.measure(
             MeasureSpec.makeMeasureSpec(buttonSize.toInt(), MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(buttonSize.toInt(), MeasureSpec.EXACTLY)
         )
-        setMeasuredDimension(menuView.measuredWidth, menuView.measuredHeight + buttonRadius.toInt())
+        setMeasuredDimension(width, height)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        menuView.layout(
+        menuView?.layout(
             visibleBound.left.toInt(),
             visibleBound.top.toInt(),
             visibleBound.right.toInt(),
