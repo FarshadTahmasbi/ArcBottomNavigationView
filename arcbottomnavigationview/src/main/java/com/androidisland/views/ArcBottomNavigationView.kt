@@ -15,10 +15,9 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.view.ViewCompat
 import androidx.core.view.iterator
+import androidx.core.view.setPadding
 import androidx.core.view.size
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
@@ -48,8 +47,17 @@ class ArcBottomNavigationView : BottomNavigationView {
         private const val CURVE_MAX_POINTS = 100
     }
 
-    private var button: MaterialButton? = null
+    private var button: ArcButton? = null
     private var menuView: BottomNavigationMenuView
+
+    var buttonSize: Float = DEFAULT_BUTTON_SIZE.toPixel()
+        set(value) {
+            field = value
+            buttonRadius = value / 2
+            if (buttonIconSize > field) buttonIconSize = field
+//            buttonIconSize = value / 2
+            requestLayout()
+        }
 
     var buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
         set(value) {
@@ -72,11 +80,11 @@ class ArcBottomNavigationView : BottomNavigationView {
                 icon = value
             }
         }
-    var buttonIconSize: Float = buttonRadius
+    var buttonIconSize: Float = buttonSize
         set(value) {
-            field = Math.min(buttonSize / 2, value)
+            field = Math.min(buttonSize, value)
             button?.apply {
-                iconSize = value.toInt()
+                iconSize = field.toInt()
             }
         }
 
@@ -122,13 +130,6 @@ class ArcBottomNavigationView : BottomNavigationView {
             }
         }
 
-    private var buttonSize: Float = DEFAULT_BUTTON_SIZE.toPixel()
-        set(value) {
-            field = value
-            buttonRadius = value / 2
-            buttonIconSize = value / 2
-            requestLayout()
-        }
 
     private var currentState: State = State.FLAT
     var state: State = currentState
@@ -157,7 +158,6 @@ class ArcBottomNavigationView : BottomNavigationView {
         }
     private var currentPath = Path()
     private val invisibleMenuItemId = Random(System.currentTimeMillis()).nextInt()
-    private val navMenu = menu as MenuBuilder
     var buttonClickListener: ((arcBottomNavView: ArcBottomNavigationView) -> Unit)? = null
     var arcAnimationListener: ArcAnimationListener? = null
 
@@ -165,8 +165,6 @@ class ArcBottomNavigationView : BottomNavigationView {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, 0) {
-        buttonSize = DEFAULT_BUTTON_SIZE.toPixel()
-        buttonIconSize = buttonSize / 2
         buttonStrokeWidth = DEFAULT_BUTTON_STROKE_WIDTH.toPixel()
         buttonStrokeColor = DEFAULT_BUTTON_STROKE_COLOR
 
@@ -181,8 +179,7 @@ class ArcBottomNavigationView : BottomNavigationView {
             buttonMargin = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonMargin, buttonMargin)
             if (buttonMargin < DEFAULT_BUTTON_MARGIN.toPixel()) buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
             buttonIcon = ta.getDrawable(R.styleable.ArcBottomNavigationView_ai_buttonIcon)
-            buttonIconSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonIconSize, buttonSize / 2)
-            buttonIconSize = Math.min(buttonSize / 2, buttonIconSize)
+            buttonIconSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonIconSize, buttonIconSize)
             buttonStrokeWidth =
                 ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonStrokeWidth, buttonStrokeWidth)
             buttonStrokeColor = ta.getColor(R.styleable.ArcBottomNavigationView_ai_buttonStrokeColor, buttonStrokeColor)
@@ -195,7 +192,6 @@ class ArcBottomNavigationView : BottomNavigationView {
             currentState = if (state == 1) State.FLAT else State.ARC
             ta.recycle()
         }
-        buttonRadius = buttonSize / 2
 
         ViewCompat.setElevation(this, 0.0f)
         menuView = getChildAt(0) as BottomNavigationMenuView
@@ -206,13 +202,13 @@ class ArcBottomNavigationView : BottomNavigationView {
         regenerateMenu()
 
         //Creates button
-        val contextWrapper = ContextThemeWrapper(context, R.style.ArcTheme)
-        button = MaterialButton(contextWrapper, null, R.attr.materialButtonStyle)
+        button = ArcButton(context)
             .apply {
                 layoutParams = LayoutParams(buttonSize.toInt(), buttonSize.toInt(), Gravity.TOP or Gravity.CENTER)
                 cornerRadius = (buttonSize / 2).toInt()
                 gravity = Gravity.CENTER
                 iconPadding = 0
+                setPadding(0)
                 iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
                 iconSize = buttonIconSize.toInt()
                 icon = buttonIcon
@@ -300,6 +296,10 @@ class ArcBottomNavigationView : BottomNavigationView {
         menuView.measure(
             widthMeasureSpec,
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+        )
+        button?.measure(
+            MeasureSpec.makeMeasureSpec(buttonSize.toInt(), MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(buttonSize.toInt(), MeasureSpec.EXACTLY)
         )
         setMeasuredDimension(menuView.measuredWidth, menuView.measuredHeight + buttonRadius.toInt())
     }
@@ -643,9 +643,4 @@ class ArcBottomNavigationView : BottomNavigationView {
         fun onArcAnimationUpdate(offset: Float, from: State, to: State)
         fun onArcAnimationEnd(from: State, to: State)
     }
-
-    //TODO cancel anim on size change
-    //TODO draw edit mode problem
-    //TODO measure problem in frame layout
-    //TODO clip replace with draw to use antialias
 }
