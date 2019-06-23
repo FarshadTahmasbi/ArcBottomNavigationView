@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         arc_bottom_nav.apply {
             setOnNavigationItemSelectedListener {
+                Log.d("test123", "item selected")
                 selection_text.text = "${it.title} selected"
                 true
             }

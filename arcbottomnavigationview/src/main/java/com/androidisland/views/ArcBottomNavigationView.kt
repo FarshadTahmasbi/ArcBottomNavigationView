@@ -16,10 +16,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.iterator
-import androidx.core.view.setPadding
-import androidx.core.view.size
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuItemImpl
+import androidx.core.internal.view.SupportMenu
+import androidx.core.view.*
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -48,6 +48,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
         private const val CURVE_MAX_POINTS = 100
     }
 
+    private var itemSelectedListener: BottomNavigationView.OnNavigationItemSelectedListener? = null
     private var button: ArcButton? = null
     private var menuView: BottomNavigationMenuView? = null
 
@@ -179,6 +180,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
     private var currentPath = Path()
     private val invisibleMenuItemId = Random(System.currentTimeMillis()).nextInt()
     var buttonClickListener: ((arcBottomNavView: ArcBottomNavigationView) -> Unit)? = null
+    var deselectOnButtonClick: Boolean = false
     var arcAnimationListener: ArcAnimationListener? = null
 
     constructor(context: Context) : this(context, null)
@@ -217,6 +219,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
                     ta.getString(R.styleable.ArcBottomNavigationView_ai_fontPath)
                 )
             }
+            deselectOnButtonClick = ta.getBoolean(R.styleable.ArcBottomNavigationView_ai_deselectOnButtonClick, false)
             ta.recycle()
         }
 
@@ -250,6 +253,10 @@ open class ArcBottomNavigationView : BottomNavigationView {
                 rippleColor = ColorStateList.valueOf(buttonRippleColor)
                 visibility = if (currentState == State.FLAT) View.INVISIBLE else View.VISIBLE
                 setOnClickListener {
+                    if (deselectOnButtonClick) {
+                        selectedItemId = invisibleMenuItemId
+                        itemSelectedListener?.onNavigationItemSelected(menu.findItem(invisibleMenuItemId))
+                    }
                     buttonClickListener?.invoke(this@ArcBottomNavigationView)
                 }
                 setTextColor(Color.TRANSPARENT)
@@ -261,7 +268,6 @@ open class ArcBottomNavigationView : BottomNavigationView {
     final override fun getChildAt(index: Int): View {
         return super.getChildAt(index)
     }
-
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -283,6 +289,11 @@ open class ArcBottomNavigationView : BottomNavigationView {
     }
 
     override fun setItemHorizontalTranslationEnabled(itemHorizontalTranslationEnabled: Boolean) {
+    }
+
+    override fun setOnNavigationItemSelectedListener(listener: OnNavigationItemSelectedListener?) {
+        super.setOnNavigationItemSelectedListener(listener)
+        itemSelectedListener = listener
     }
 
     private fun regenerateMenu() {
@@ -360,11 +371,11 @@ open class ArcBottomNavigationView : BottomNavigationView {
             getBackgroundColor()?.let {
                 visibleBoundPaint.color = it
             }
-            if (!isInEditMode) {
-                drawPath(currentPath, visibleBoundPaint)
-            } else {
-                drawPath(createEditModePath(), visibleBoundPaint)
-            }
+//            if (!isInEditMode) {
+//                drawPath(currentPath, visibleBoundPaint)
+//            } else {
+//                drawPath(createEditModePath(), visibleBoundPaint)
+//            }
         }
     }
 

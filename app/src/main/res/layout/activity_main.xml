@@ -102,6 +102,7 @@
         app:ai_buttonStrokeColor="#000"
         app:ai_buttonStrokeWidth="0dp"
         app:ai_state="arc"
+        app:ai_deselectOnButtonClick="true"
         app:itemIconTint="@drawable/selector_icon_tint"
         app:itemTextColor="#fff"
         app:layout_constraintBottom_toBottomOf="parent"
