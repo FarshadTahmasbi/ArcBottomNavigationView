@@ -601,16 +601,18 @@ open class ArcBottomNavigationView : BottomNavigationView {
                     }
                 }
                 addUpdateListener {
-                    val animatedValue = it.animatedValue as Float
-                    val factor = if (state == State.FLAT) 1.0f - animatedValue else animatedValue
-                    points.forEachIndexed { index, point ->
-                        if (!isCorner(point))
-                            point.y = top + dy[index] * factor
+                    if (points.isNotEmpty()) {
+                        val animatedValue = it.animatedValue as Float
+                        val factor = if (state == State.FLAT) 1.0f - animatedValue else animatedValue
+                        points.forEachIndexed { index, point ->
+                            if (!isCorner(point))
+                                point.y = top + dy[index] * factor
+                        }
+                        currentPoints = points
+                        animateButton(animatedValue, state)
+                        arcAnimationListener?.onArcAnimationUpdate(animatedValue, currentState, state)
+                        onArcAnimationUpdate(animatedValue, currentState, state)
                     }
-                    currentPoints = points
-                    animateButton(animatedValue, state)
-                    arcAnimationListener?.onArcAnimationUpdate(animatedValue, currentState, state)
-                    onArcAnimationUpdate(animatedValue, currentState, state)
                 }
                 addListener(object : SimpleAnimatorListener() {
                     override fun onAnimationStart(animation: Animator?, isReverse: Boolean) {
