@@ -258,6 +258,10 @@ open class ArcBottomNavigationView : BottomNavigationView {
         ViewCompat.setElevation(button!!, 0.0f)
     }
 
+    final override fun getChildAt(index: Int): View {
+        return super.getChildAt(index)
+    }
+
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -303,10 +307,6 @@ open class ArcBottomNavigationView : BottomNavigationView {
         }
         updateInvisibleMenuItem(currentState)
     }
-
-    private fun invisibleItemExists() = menu.size() % 2 == 1
-
-    private fun invisibleMenuItem() = findViewById<View>(invisibleMenuItemId)
 
     private fun updateInvisibleMenuItem(state: State) {
         val item = menu.findItem(invisibleMenuItemId)
@@ -357,7 +357,9 @@ open class ArcBottomNavigationView : BottomNavigationView {
         super.onDraw(canvas)
         canvas?.apply {
             restore()
-            getBackgroundColor()?.let { visibleBoundPaint.color = it }
+            getBackgroundColor()?.let {
+                visibleBoundPaint.color = it
+            }
             if (!isInEditMode) {
                 drawPath(currentPath, visibleBoundPaint)
             } else {
@@ -561,7 +563,20 @@ open class ArcBottomNavigationView : BottomNavigationView {
     private fun shouldAnimate(point: PointF) = point.y > visibleBound.top && point.y < visibleBound.bottom
 
     private fun transitionTo(state: State, duration: Long = DEFAULT_ANIM_DURATION) {
-        if (state == currentState || animator?.isRunning == true) return
+        if (state == currentState) return
+        if (measuredWidth == 0 || measuredHeight == 0) {
+            currentState = state
+            menu.findItem(invisibleMenuItemId)?.apply {
+                isVisible = currentState == State.ARC
+            }
+            button?.apply {
+                scaleX = if (currentState == State.ARC) 1.0f else 0.0f
+                scaleY = if (currentState == State.ARC) 1.0f else 0.0f
+                visibility = if (currentState == State.ARC) View.VISIBLE else View.INVISIBLE
+            }
+            return
+        }
+
         animator?.apply {
             cancel()
         }
@@ -612,6 +627,11 @@ open class ArcBottomNavigationView : BottomNavigationView {
                         arcAnimationListener?.onArcAnimationEnd(from, state)
                         onArcAnimationEnd(from, state)
                     }
+
+                    override fun onAnimationCancel(animation: Animator?) {
+                        super.onAnimationCancel(animation)
+                        currentState = state
+                    }
                 })
                 start()
             }
@@ -621,7 +641,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
 
 
     public fun toggleState() {
-        transitionTo(toggleState(currentState))
+        state = toggleState(currentState)
     }
 
     private fun MutableList<PointF>.clone(): MutableList<PointF> {
