@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         ColorPicker(this)
             .setDefaultColorButton(defaultColor)
             .setColors(R.array.colors)
-            .setColumns(3)
+            .setColumns(4)
             .disableDefaultButtons(true)
             .setOnFastChooseColorListener(object : ColorPicker.OnFastChooseColorListener {
                 override fun setOnFastChooseColorListener(position: Int, color: Int) {
