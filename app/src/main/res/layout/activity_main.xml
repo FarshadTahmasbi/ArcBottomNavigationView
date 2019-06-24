@@ -181,7 +181,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:gravity="left|center_vertical"
-        android:text="Button tint"
+        android:text="Button tint color"
         android:textColor="#000"
         app:layout_constraintBottom_toBottomOf="@id/back_color"
         app:layout_constraintLeft_toRightOf="@+id/button_tint_color"
