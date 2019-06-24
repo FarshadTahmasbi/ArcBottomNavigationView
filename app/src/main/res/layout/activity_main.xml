@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F0F0F0"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -33,11 +34,12 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="12dp"
         android:checked="true"
         android:text="Arc State"
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="@id/selection_text"
-        app:layout_constraintRight_toRightOf="@id/selection_text"
+        app:layout_constraintRight_toRightOf="@id/hv"
         app:layout_constraintTop_toBottomOf="@id/selection_text" />
 
     <TextView
@@ -52,6 +54,16 @@
         app:layout_constraintLeft_toLeftOf="@id/state_switch"
         app:layout_constraintRight_toRightOf="@id/hv"
         app:layout_constraintTop_toBottomOf="@id/state_switch" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/deselect_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="Deselect on button Click"
+        app:layout_constraintBottom_toBottomOf="@id/state_switch"
+        app:layout_constraintLeft_toLeftOf="@id/hv"
+        app:layout_constraintTop_toTopOf="@id/state_switch" />
 
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/button_size_seek"
@@ -86,6 +98,177 @@
         app:layout_constraintRight_toRightOf="@id/selection_text"
         app:layout_constraintTop_toTopOf="@id/icon_size_text" />
 
+    <TextView
+        android:id="@+id/button_margin_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:gravity="left|center_vertical"
+        android:text="Button margin"
+        android:textColor="#000"
+        app:layout_constraintLeft_toLeftOf="@id/button_size_text"
+        app:layout_constraintRight_toRightOf="@id/hv"
+        app:layout_constraintTop_toBottomOf="@id/icon_size_text" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/button_margin_seek"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="8"
+        android:progress="1"
+        app:layout_constraintBottom_toBottomOf="@id/button_margin_text"
+        app:layout_constraintLeft_toLeftOf="@id/hv"
+        app:layout_constraintRight_toRightOf="@id/selection_text"
+        app:layout_constraintTop_toTopOf="@id/button_margin_text" />
+
+    <TextView
+        android:id="@+id/button_stroke_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:gravity="left|center_vertical"
+        android:text="Button stroke width"
+        android:textColor="#000"
+        app:layout_constraintLeft_toLeftOf="@id/button_size_text"
+        app:layout_constraintRight_toRightOf="@id/hv"
+        app:layout_constraintTop_toBottomOf="@id/button_margin_text" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/button_stroke_seek"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="8"
+        android:progress="1"
+        app:layout_constraintBottom_toBottomOf="@id/button_stroke_text"
+        app:layout_constraintLeft_toLeftOf="@id/hv"
+        app:layout_constraintRight_toRightOf="@id/selection_text"
+        app:layout_constraintTop_toTopOf="@id/button_stroke_text" />
+
+    <View
+        android:id="@+id/back_color"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        android:background="#000"
+        app:layout_constraintLeft_toLeftOf="@id/button_size_text"
+        app:layout_constraintTop_toBottomOf="@id/button_stroke_text" />
+
+    <TextView
+        android:id="@+id/back_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:gravity="left|center_vertical"
+        android:text="Background color"
+        android:textColor="#000"
+        app:layout_constraintBottom_toBottomOf="@id/back_color"
+        app:layout_constraintLeft_toRightOf="@+id/back_color"
+        app:layout_constraintTop_toTopOf="@id/back_color" />
+
+    <View
+        android:id="@+id/button_tint_color"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="#000"
+        app:layout_constraintLeft_toLeftOf="@id/hv"
+        app:layout_constraintTop_toTopOf="@id/back_color" />
+
+    <TextView
+        android:id="@+id/button_tint_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:gravity="left|center_vertical"
+        android:text="Button tint"
+        android:textColor="#000"
+        app:layout_constraintBottom_toBottomOf="@id/back_color"
+        app:layout_constraintLeft_toRightOf="@+id/button_tint_color"
+        app:layout_constraintTop_toTopOf="@id/back_color" />
+
+    <View
+        android:id="@+id/icon_tint_color"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        android:background="#000"
+        app:layout_constraintLeft_toLeftOf="@id/button_size_text"
+        app:layout_constraintTop_toBottomOf="@id/back_color" />
+
+    <TextView
+        android:id="@+id/icon_tint_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:gravity="left|center_vertical"
+        android:text="Icon tint color"
+        android:textColor="#000"
+        app:layout_constraintBottom_toBottomOf="@id/icon_tint_color"
+        app:layout_constraintLeft_toRightOf="@+id/icon_tint_color"
+        app:layout_constraintTop_toTopOf="@id/icon_tint_color" />
+
+    <View
+        android:id="@+id/button_stroke_color"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="#000"
+        app:layout_constraintLeft_toLeftOf="@id/hv"
+        app:layout_constraintTop_toTopOf="@id/icon_tint_color" />
+
+    <TextView
+        android:id="@+id/button_stroke_color_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:gravity="left|center_vertical"
+        android:text="Button stroke color"
+        android:textColor="#000"
+        app:layout_constraintBottom_toBottomOf="@id/button_stroke_color"
+        app:layout_constraintLeft_toRightOf="@+id/button_tint_color"
+        app:layout_constraintTop_toTopOf="@id/button_stroke_color" />
+
+    <View
+        android:id="@+id/ripple_color"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        android:background="#000"
+        app:layout_constraintLeft_toLeftOf="@id/button_size_text"
+        app:layout_constraintTop_toBottomOf="@id/icon_tint_color" />
+
+    <TextView
+        android:id="@+id/ripple_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:gravity="left|center_vertical"
+        android:text="Button ripple color"
+        android:textColor="#000"
+        app:layout_constraintBottom_toBottomOf="@id/ripple_color"
+        app:layout_constraintLeft_toRightOf="@+id/icon_tint_color"
+        app:layout_constraintTop_toTopOf="@id/ripple_color" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:id="@+id/git_text"
+        android:padding="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textColor="#000"
+        android:layout_marginBottom="12dp"
+        android:drawableLeft="@drawable/github_circle"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:text="Make me happy with a star!"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@id/arc_bottom_nav"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ripple_color"
+        app:layout_constraintVertical_bias="0" />
+
 
     <com.androidisland.views.ArcBottomNavigationView
         android:id="@+id/arc_bottom_nav"
@@ -93,16 +276,16 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="#4CAF50"
-        app:ai_buttonBackgroundTint="#673AB7"
+        app:ai_buttonBackgroundTint="#E91E63"
         app:ai_buttonIcon="@drawable/ic_create_black_24dp"
         app:ai_buttonIconSize="32dp"
         app:ai_buttonIconTint="#FFF"
-        app:ai_buttonRippleColor="#fff"
+        app:ai_buttonRippleColor="#FFF"
         app:ai_buttonSize="56dp"
-        app:ai_buttonStrokeColor="#000"
+        app:ai_buttonStrokeColor="#E91E63"
         app:ai_buttonStrokeWidth="0dp"
+        app:ai_deselectOnButtonClick="false"
         app:ai_state="arc"
-        app:ai_deselectOnButtonClick="true"
         app:itemIconTint="@drawable/selector_icon_tint"
         app:itemTextColor="#fff"
         app:layout_constraintBottom_toBottomOf="parent"

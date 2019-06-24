@@ -8,6 +8,7 @@ import android.content.res.ColorStateList
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -178,7 +179,12 @@ open class ArcBottomNavigationView : BottomNavigationView {
             invalidate()
         }
     private var currentPath = Path()
-    private val invisibleMenuItemId = Random(System.currentTimeMillis()).nextInt()
+    private val invisibleMenuItemId =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            View.generateViewId()
+        } else {
+            Random(System.currentTimeMillis()).nextInt()
+        }
     var buttonClickListener: ((arcBottomNavView: ArcBottomNavigationView) -> Unit)? = null
     var deselectOnButtonClick: Boolean = false
     var arcAnimationListener: ArcAnimationListener? = null
