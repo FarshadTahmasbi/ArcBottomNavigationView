@@ -1,7 +1,6 @@
 package com.androidisland.views.sample
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -30,8 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         arc_bottom_nav.apply {
             setOnNavigationItemSelectedListener {
-                Log.d("test123", "item selected")
-                selection_text.text = "${it.title} selected"
+                selection_text.text = "${it.title}"
                 true
             }
             selectedItemId = R.id.menu_home
@@ -39,6 +37,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(context, "ArcBottomNAvigationView Button Clicked!", Toast.LENGTH_SHORT)
                     .show()
             }
+            showBadge(R.id.menu_home).number = 20
         }
 
         state_switch.setOnCheckedChangeListener { compoundButton, checked ->
@@ -83,56 +82,5 @@ class MainActivity : AppCompatActivity() {
             }
         })
         icon_size_seek.progress = (arc_bottom_nav.buttonIconSize.toDip() - MIN_SIZE).toInt()
-
-
-
-        Log.d("test123", "${56.toPixel()}")
-        Log.d("test123", "${56.toPixel().toDip()}")
-//        toggle_btn.setOnClickListener {
-//            arcBottomNav.toggleState()
-//        }
-//        arcBottomNav.apply {
-//            setOnNavigationItemSelectedListener {
-//                Log.d("test123", "selected!")
-//                true
-//            }
-//            buttonClickListener = {
-//                Log.d("test123", "Button clicked!")
-////            it.state = ArcBottomNavigationView.State.FLAT
-////            it.buttonMargin = 16.toPixel()
-//            }
-//        }
-
-//        state_switch.setOnCheckedChangeListener { buttonView, isChecked ->
-//            if (isChecked) {
-//                buttonView.text = "Arc is on"
-//                arcBottomNav.state = ArcBottomNavigationView.State.ARC
-//            } else {
-//                buttonView.text = "Arc is off"
-//                arcBottomNav.state = ArcBottomNavigationView.State.FLAT
-//
-//            }
-//        }
-
-//        size_seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-//            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-////                arcBottomNav.buttonSize = progress.toPixel()
-//                arcBottomNav.buttonIconSize = progress.toPixel()
-////                (arcBottomNav.getChildAt(1) as MaterialButton).apply {
-////                    iconSize = progress.toPixel().toInt()
-////                    iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
-//////                    iconPadding = 0
-//////                    setPadding(iconSize/2, 0,0,0)
-////                    Log.d("test123", "progress:${progress.toPixel()}, iconSize=$iconSize")
-////                }
-//            }
-
-//            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-//            }
-//
-//            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-//            }
-//
-//        })
     }
 }
