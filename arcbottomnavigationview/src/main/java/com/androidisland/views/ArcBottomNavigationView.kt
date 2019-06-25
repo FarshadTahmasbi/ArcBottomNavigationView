@@ -22,6 +22,7 @@ import androidx.appcompat.view.menu.MenuItemImpl
 import androidx.core.internal.view.SupportMenu
 import androidx.core.view.*
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
@@ -207,7 +208,11 @@ open class ArcBottomNavigationView : BottomNavigationView {
             buttonSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonSize, buttonSize)
             buttonMargin = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonMargin, buttonMargin)
             if (buttonMargin < DEFAULT_BUTTON_MARGIN.toPixel()) buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
-            buttonIcon = ta.getDrawable(R.styleable.ArcBottomNavigationView_ai_buttonIcon)
+            if (ta.hasValue(R.styleable.ArcBottomNavigationView_ai_buttonIcon)) {
+                val iconResId = ta.getResourceId(R.styleable.ArcBottomNavigationView_ai_buttonIcon, 0)
+                if (iconResId > 0)
+                    buttonIcon = VectorDrawableCompat.create(resources, iconResId, null)
+            }
             buttonIconSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonIconSize, buttonIconSize)
             buttonStrokeWidth =
                 ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonStrokeWidth, buttonStrokeWidth)
