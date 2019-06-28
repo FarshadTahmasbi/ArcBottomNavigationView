@@ -9,8 +9,8 @@ def _groupId = 'com.androidisland.views'
 def _artifactId = 'arcbottomnavigationview'
 def _userOrg = 'androidisland'
 def _repoName = 'ArcBottomNavigationView'
-def _desc = ''
-def _git = ''
+def _desc = 'A custom version of BottomNavigationView with curved appearance'
+def _git = 'https://github.com/FarshadTahmasbi/ArcBottomNavigationView'
 
 publish {
     userOrg = _userOrg
@@ -29,8 +29,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode _versionCode
+        versionName _versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

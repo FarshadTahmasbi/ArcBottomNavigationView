@@ -17,10 +17,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.view.menu.MenuItemImpl
-import androidx.core.internal.view.SupportMenu
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.iterator
+import androidx.core.view.setPadding
+import androidx.core.view.size
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -632,8 +632,8 @@ open class ArcBottomNavigationView : BottomNavigationView {
                     }
                 }
                 addListener(object : SimpleAnimatorListener() {
-                    override fun onAnimationStart(animation: Animator?, isReverse: Boolean) {
-                        super.onAnimationStart(animation, isReverse)
+                    override fun onAnimationStart(animation: Animator?) {
+                        super.onAnimationStart(animation)
                         updateInvisibleMenuItem(state)
                         arcAnimationListener?.onArcAnimationStart(currentState, state)
                         onArcAnimationStart(currentState, state)
@@ -678,7 +678,6 @@ open class ArcBottomNavigationView : BottomNavigationView {
     }
 
     protected fun onArcAnimationEnd(from: State, to: State) {
-
     }
 
     private fun animateButton(offset: Float, to: State) {
@@ -696,18 +695,16 @@ open class ArcBottomNavigationView : BottomNavigationView {
     }
 
     private open class SimpleAnimatorListener : Animator.AnimatorListener {
-
-        override fun onAnimationRepeat(animation: Animator?) {
-
+        override fun onAnimationRepeat(p0: Animator?) {
         }
 
-        override fun onAnimationEnd(animation: Animator?) {
+        override fun onAnimationEnd(p0: Animator?) {
         }
 
-        override fun onAnimationCancel(animation: Animator?) {
+        override fun onAnimationCancel(p0: Animator?) {
         }
 
-        override fun onAnimationStart(animation: Animator?) {
+        override fun onAnimationStart(p0: Animator?) {
         }
     }
 
