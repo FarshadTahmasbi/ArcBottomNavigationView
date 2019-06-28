@@ -284,7 +284,7 @@
         app:ai_buttonSize="56dp"
         app:ai_buttonStrokeColor="#E91E63"
         app:ai_buttonStrokeWidth="0dp"
-        app:ai_deselectOnButtonClick="false"
+        app:ai_selectableButton="false"
         app:ai_state="arc"
         app:itemIconTint="@drawable/selector_icon_tint"
         app:itemTextColor="#fff"

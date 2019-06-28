@@ -230,7 +230,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
                     ta.getString(R.styleable.ArcBottomNavigationView_ai_fontPath)
                 )
             }
-            deselectOnButtonClick = ta.getBoolean(R.styleable.ArcBottomNavigationView_ai_deselectOnButtonClick, false)
+            deselectOnButtonClick = ta.getBoolean(R.styleable.ArcBottomNavigationView_ai_selectableButton, false)
             ta.recycle()
         }
 
