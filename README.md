@@ -45,9 +45,8 @@ Then add this to build.gradle in app module
       app:layout_constraintRight_toRightOf="parent"  
       app:menu="@menu/bottom_nav_items" />
       
-###      
 |*attribute*| *description* |
-|--|--|--|
+|--|--|
 | `ai_state`| current state of view,`flat` or `arc`|
 | `ai_buttonSize`| material button size|
 | `ai_buttonMargin`| material button margin with parent borders|
