@@ -42,7 +42,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
         private const val TAG = "ArcBottomNavigationView"
         //Dimens are in Dp
         private const val DEFAULT_BUTTON_SIZE = 56
-        private const val DEFAULT_BUTTON_MARGIN = 8
+        private const val MIN_BUTTON_MARGIN = 4
         private const val DEFAULT_BUTTON_STROKE_WIDTH = 0
         private const val DEFAULT_BUTTON_STROKE_COLOR = Color.TRANSPARENT
 
@@ -62,13 +62,14 @@ open class ArcBottomNavigationView : BottomNavigationView {
             requestLayout()
         }
 
-    var buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
+    var buttonMargin = MIN_BUTTON_MARGIN.toPixel()
         set(value) {
             if (field != value) {
-                field = value
+                field = Math.max(value, MIN_BUTTON_MARGIN.toPixel())
                 updatePoints(width)
             }
         }
+
     private var buttonRadius = (DEFAULT_BUTTON_SIZE / 2).toPixel()
         set(value) {
             field = value
@@ -76,6 +77,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
                 cornerRadius = value.toInt()
             }
         }
+
     var buttonIcon: Drawable? = null
         set(value) {
             field = value
@@ -83,6 +85,7 @@ open class ArcBottomNavigationView : BottomNavigationView {
                 icon = value
             }
         }
+
     var buttonIconSize: Float = buttonSize
         set(value) {
             field = Math.min(buttonSize, value)
@@ -207,7 +210,6 @@ open class ArcBottomNavigationView : BottomNavigationView {
             val ta = context.obtainStyledAttributes(this, R.styleable.ArcBottomNavigationView)
             buttonSize = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonSize, buttonSize)
             buttonMargin = ta.getDimension(R.styleable.ArcBottomNavigationView_ai_buttonMargin, buttonMargin)
-            if (buttonMargin < DEFAULT_BUTTON_MARGIN.toPixel()) buttonMargin = DEFAULT_BUTTON_MARGIN.toPixel()
             if (ta.hasValue(R.styleable.ArcBottomNavigationView_ai_buttonIcon)) {
                 val iconResId = ta.getResourceId(R.styleable.ArcBottomNavigationView_ai_buttonIcon, 0)
                 if (iconResId > 0)

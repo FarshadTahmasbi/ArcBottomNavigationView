@@ -81,11 +81,11 @@ class MainActivity : AppCompatActivity() {
 
         button_margin_seek.setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
             override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
-                arc_bottom_nav.buttonMargin = (progress + 8).toPixel()
-                button_margin_text.text = "Button margin: ${progress + 8} dp"
+                arc_bottom_nav.buttonMargin = (progress + 4).toPixel()
+                button_margin_text.text = "Button margin: ${progress + 4} dp"
             }
         })
-        button_margin_seek.progress = (arc_bottom_nav.buttonMargin.toDip() - 8).toInt()
+        button_margin_seek.progress = (arc_bottom_nav.buttonMargin.toDip() - 4).toInt()
 
         button_stroke_seek.setOnSeekBarChangeListener(object : SimpleSeekBarChangeListener() {
             override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
