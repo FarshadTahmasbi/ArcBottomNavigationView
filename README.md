@@ -1,6 +1,5 @@
 
-# ArcBottomNavigationView
-[ ![Download](https://api.bintray.com/packages/androidisland/ArcBottomNavigationView/arcbottomnavigationview/images/download.svg)](https://bintray.com/androidisland/ArcBottomNavigationView/arcbottomnavigationview/_latestVersion)
+# ArcBottomNavigationView [ ![Download](https://api.bintray.com/packages/androidisland/ArcBottomNavigationView/arcbottomnavigationview/images/download.svg)](https://bintray.com/androidisland/ArcBottomNavigationView/arcbottomnavigationview/_latestVersion)
 
 Custom version of `BottomNavigationView` with a curved appearance
 ![](raw/arcbottomnav.png)
@@ -45,6 +44,23 @@ Then add this to build.gradle in app module
       app:layout_constraintLeft_toLeftOf="parent"  
       app:layout_constraintRight_toRightOf="parent"  
       app:menu="@menu/bottom_nav_items" />
+      
+###      
+|*attribute*| *description* |
+|--|--|--|
+| `ai_state`| current state of view,`flat` or `arc`|
+| `ai_buttonSize`| material button size|
+| `ai_buttonMargin`| material button margin with parent borders|
+| `ai_buttonBackgroundTint`| material button background tint color|
+| `ai_buttonStrokeColor`| material button stroke color|
+| `ai_buttonStrokeWidth`| material button stroke width|
+| `ai_buttonRippleColor`| material button ripple effect color|
+| `ai_buttonIcon`| material button icon drawable|
+| `ai_buttonIconSize`| material button icon size|
+| `ai_buttonIconTint`| material button icon tint color|
+| `ai_fontPath`| menu items typeface (path of fonts copied to assets folder)|
+| `ai_selectableButton`| if set it to `true` when user clicks button, the current item will be deselected|
+
 
 ## License
 
