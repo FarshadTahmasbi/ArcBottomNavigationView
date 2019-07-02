@@ -1,5 +1,5 @@
 
-# ArcBottomNavigationView [ ![Download](https://api.bintray.com/packages/androidisland/ArcBottomNavigationView/arcbottomnavigationview/images/download.svg)](https://bintray.com/androidisland/ArcBottomNavigationView/arcbottomnavigationview/_latestVersion)
+# ArcBottomNavigationView [ ![Download](https://api.bintray.com/packages/androidisland/ArcBottomNavigationView/arcbottomnavigationview/images/download.svg) ](https://bintray.com/androidisland/ArcBottomNavigationView/arcbottomnavigationview/_latestVersion)
 
 Custom version of `BottomNavigationView` with a curved appearance
 ![](raw/arcbottomnav.png)
