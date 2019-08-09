@@ -1,20 +1,12 @@
 
-# ArcBottomNavigationView [ ![Download](https://api.bintray.com/packages/androidisland/ArcBottomNavigationView/arcbottomnavigationview/images/download.svg) ](https://bintray.com/androidisland/ArcBottomNavigationView/arcbottomnavigationview/_latestVersion)
+# ArcBottomNavigationView [ ![Download](https://api.bintray.com/packages/farshad-tmb/ArcBottomNavigationView/arcbottomnavigationview/images/download.svg) ](https://bintray.com/farshad-tmb/ArcBottomNavigationView/arcbottomnavigationview/_latestVersion)
 
 Custom version of `BottomNavigationView` with a curved appearance
 ![](raw/arcbottomnav.png)
 
-## Gradle
+## Gradle Setup
 
-Add maven repository to build.gradle root level
-
-	allprojects {
-		repositories {
-			maven { url "https://androidisland.bintray.com/ArcBottomNavigationView" }
-		}
-	}
-  
-Then add this to build.gradle in app module
+Add this to build.gradle in app module
   
   	dependencies {
 	        implementation 'com.androidisland.views:arcbottomnavigationview:1.0.0'
