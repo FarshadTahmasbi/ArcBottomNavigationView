@@ -1,16 +1,17 @@
 
-# ArcBottomNavigationView [ ![Download](https://api.bintray.com/packages/farshad-tmb/ArcBottomNavigationView/arcbottomnavigationview/images/download.svg) ](https://bintray.com/farshad-tmb/ArcBottomNavigationView/arcbottomnavigationview/_latestVersion)
+---
+
+### NOTE: This library is no longer maintained.
+
+---
+
+# ArcBottomNavigationView 
 
 Custom version of `BottomNavigationView` with a curved appearance
+
+
 ![](raw/arcbottomnav.png)
 
-## Gradle Setup
-
-Add this to build.gradle in app module
-  
-  	dependencies {
-	        implementation 'com.androidisland.views:arcbottomnavigationview:1.0.0'
-	}
 
 ## Usage
 
